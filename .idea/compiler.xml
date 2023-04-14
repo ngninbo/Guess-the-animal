@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="17">
+      <module name="Guess_the_Animal.Guess_the_Animal-task-build-classes-java.main" target="11" />
+      <module name="Guess_the_Animal.Guess_the_Animal-task-build-generated-sources-annotationProcessor-java.main" target="11" />
+      <module name="Guess_the_Animal.Guess_the_Animal-task-build-generated-sources-headers-java.main" target="11" />
+      <module name="Guess_the_Animal.Guess_the_Animal-task-build-reports-tests.main" target="11" />
+      <module name="Guess_the_Animal.Guess_the_Animal-task-build-test-results.main" target="11" />
+      <module name="Guess_the_Animal.Guess_the_Animal-task-build-tmp.main" target="11" />
+      <module name="Guess_the_Animal.Guess_the_Animal-task.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Array_exceptions-Calculate_Square.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Array_exceptions-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Class_Loader-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Class_Loader-What_class_loader_is_used.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Custom_exceptions-Checked_exception_with_constructor.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Custom_exceptions-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Exception_handling-Converting_and_multiplying.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Exception_handling-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Factory_method-Burger_store.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Factory_method-Clocks.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Factory_method-Robot.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Factory_method-Robot_factory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Factory_method-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Generics_and_Object-Boxes_are_not_just_objects_.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Generics_and_Object-Initialize_an_object_of_a_generic_class.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Generics_and_Object-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Iterating_over_arrays-Alphabetical_order.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Iterating_over_arrays-Right_Rotation.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Iterating_over_arrays-The_index_of_the_first_max_in_an_array.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Iterating_over_arrays-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Output_streams-Convert_to_char_array.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Output_streams-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Parallel_streams-Inverting_streams.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Parallel_streams-Prime_numbers.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Parallel_streams-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Patterns_and_Matcher-Number_parsing.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Patterns_and_Matcher-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Printing_data-Digits_from_0_to_9_backwards.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Printing_data-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Printing_data-We_need_to_learn_Java.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Regexes_in_programs-Card_name_validation_and_identification.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Regexes_in_programs-Check_the_date.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Regexes_in_programs-Safe_password.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Regexes_in_programs-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Regexes_in_programs-Vehicle_registration_number.main" target="11" />
+      <module name="Guess_the_Animal.Topics-String-Check_burgs.main" target="11" />
+      <module name="Guess_the_Animal.Topics-String-Extracting_a_substring.main" target="11" />
+      <module name="Guess_the_Animal.Topics-String-Replacing_'a'_with_'b'.main" target="11" />
+      <module name="Guess_the_Animal.Topics-String-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-The_for-loop-Maximum_element_divisible_by_four.main" target="11" />
+      <module name="Guess_the_Animal.Topics-The_for-loop-Size_of_parts.main" target="11" />
+      <module name="Guess_the_Animal.Topics-The_for-loop-The_count_of_numbers_divisible_by_N.main" target="11" />
+      <module name="Guess_the_Animal.Topics-The_for-loop-The_product_of_numbers_from_a_to_b.main" target="11" />
+      <module name="Guess_the_Animal.Topics-The_for-loop-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Throwing_exceptions-Theory.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Throwing_exceptions-Throw_a_checked_exception.main" target="11" />
+      <module name="Guess_the_Animal.Topics-Throwing_exceptions-Throw_an_IOException.main" target="11" />
+      <module name="Guess_the_Animal.util.main" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

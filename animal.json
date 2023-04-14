@@ -1,0 +1,21 @@
+{
+  "value" : "It can climb trees",
+  "left" : {
+    "value" : "a shark"
+  },
+  "right" : {
+    "value" : "It is a mammal",
+    "left" : {
+      "value" : "a cat"
+    },
+    "right" : {
+      "value" : "It is leaving in forest",
+      "left" : {
+        "value" : "a dog"
+      },
+      "right" : {
+        "value" : "a fog"
+      }
+    }
+  }
+}

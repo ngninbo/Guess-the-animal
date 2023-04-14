@@ -1,0 +1,43 @@
+{
+  "positivesResponses": [
+    "y",
+    "yes",
+    "yeah",
+    "yep",
+    "sure",
+    "right",
+    "affirmative",
+    "correct",
+    "indeed",
+    "you bet",
+    "exactly",
+    "you said it"
+  ],
+  "negativesResponses": [
+    "n",
+    "no",
+    "no way",
+    "nah",
+    "nope",
+    "negative",
+    "i don't think so",
+    "yeah no"
+  ],
+  "questions": [
+    "I'm not sure I caught you: was it yes or no?",
+    "Funny, I still don't understand, is it yes or no?",
+    "Oh, it's too complicated for me: just tell me yes or no.",
+    "Could you please simply say yes or no?",
+    "Oh, no, don't try to confuse me: say yes or no."
+  ],
+  "byeOptions": [
+    "Bye!",
+    "Goodbye",
+    "See you soon!",
+    "See you later!",
+    "Bye! Have a good day.",
+    "Bye! Take care.",
+    "Bye! Take it easy.",
+    "It was greet to speech with you, but I've to go. Goodbye!"
+  ]
+}

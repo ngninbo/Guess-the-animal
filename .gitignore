@@ -1,0 +1,41 @@
+# Project exclude paths
+/.gradle/
+/Guess the Animal/task/build/
+/Guess the Animal/task/out/
+/Guess the Animal/task/out/production/classes/
+/Topics/Array exceptions/Theory/out/
+/Topics/Array exceptions/Theory/out/production/classes/
+/Topics/Class Loader/What class loader is used/out/
+/Topics/Class Loader/What class loader is used/out/production/classes/
+/Topics/Exception handling/Converting and multiplying/out/
+/Topics/Exception handling/Converting and multiplying/out/production/classes/
+/Topics/Factory method/Clocks/out/
+/Topics/Factory method/Clocks/out/production/classes/
+/Topics/Factory method/Robot/out/
+/Topics/Factory method/Robot/out/production/classes/
+/Topics/Iterating over arrays/Alphabetical order/out/
+/Topics/Iterating over arrays/Alphabetical order/out/production/classes/
+/Topics/Iterating over arrays/Theory/out/
+/Topics/Iterating over arrays/Theory/out/production/classes/
+/Topics/Output streams/Convert to char array/out/
+/Topics/Output streams/Convert to char array/out/production/classes/
+/Topics/Patterns and Matcher/Number parsing/out/
+/Topics/Patterns and Matcher/Number parsing/out/production/classes/
+/Topics/Printing data/Digits from 0 to 9 backwards/out/
+/Topics/Printing data/Digits from 0 to 9 backwards/out/production/classes/
+/Topics/Printing data/We need to learn Java/out/
+/Topics/Printing data/We need to learn Java/out/production/classes/
+/Topics/Regexes in programs/Card name validation and identification/out/
+/Topics/Regexes in programs/Card name validation and identification/out/production/classes/
+/Topics/Regexes in programs/Check the date/out/
+/Topics/Regexes in programs/Check the date/out/production/classes/
+/Topics/String/Extracting a substring/out/
+/Topics/String/Extracting a substring/out/production/classes/
+/Topics/String/Theory/out/
+/Topics/String/Theory/out/production/classes/
+/Topics/The for-loop/Maximum element divisible by four/out/
+/Topics/The for-loop/Maximum element divisible by four/out/production/classes/
+/Topics/Throwing exceptions/Throw a checked exception/out/
+/Topics/Throwing exceptions/Throw a checked exception/out/production/classes/
+/Topics/Throwing exceptions/Throw an IOException/out/
+/Topics/Throwing exceptions/Throw an IOException/out/production/classes/

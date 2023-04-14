@@ -1,0 +1,27 @@
+{
+  "value" : "It is a mammal",
+  "left" : {
+    "value" : "It is leaving in water.",
+    "left" : {
+      "value" : "a shark"
+    },
+    "right" : {
+      "value" : "a frog"
+    }
+  },
+  "right" : {
+    "value" : "It can climb trees",
+    "left" : {
+      "value" : "It is leaving in savana",
+      "left" : {
+        "value" : "a dog"
+      },
+      "right" : {
+        "value" : "an elefant"
+      }
+    },
+    "right" : {
+      "value" : "a cat"
+    }
+  }
+}

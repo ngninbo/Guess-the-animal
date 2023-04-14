@@ -1,0 +1,15 @@
+<Node>
+  <value>It is a mammal</value>
+  <left>
+    <value>a shark</value>
+  </left>
+  <right>
+    <value>it can climb trees</value>
+    <left>
+      <value>a dog</value>
+    </left>
+    <right>
+      <value>a cat</value>
+    </right>
+  </right>
+</Node>

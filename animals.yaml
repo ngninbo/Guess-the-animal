@@ -1,0 +1,18 @@
+---
+value: "It is a mammal"
+left:
+  value: "a shark"
+right:
+  value: "It is leaving in the forest"
+  left:
+    value: "It can climb trees"
+    left:
+      value: "a dog"
+    right:
+      value: "a cat"
+  right:
+    value: "It is a shy animal"
+    left:
+      value: "a wolf"
+    right:
+      value: "a hare"
