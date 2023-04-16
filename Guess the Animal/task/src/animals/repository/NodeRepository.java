@@ -17,8 +17,6 @@ public interface NodeRepository {
 
     List<String> findLeafNodes(Node node);
 
-    int minDepth(Node node);
-
     TreeStats summary(BinaryTree tree);
 
     void update(BinaryTree tree, Node node, String statement, String animal, Direction direction);
@@ -28,4 +26,6 @@ public interface NodeRepository {
     List<String> findStatements(Node node);
 
     Stack<String> findAncestors(BinaryTree tree, String animal);
+
+    boolean remove(String animal, BinaryTree tree);
 }

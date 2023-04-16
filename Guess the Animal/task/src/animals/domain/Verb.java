@@ -2,16 +2,20 @@ package animals.domain;
 
 public enum Verb {
 
-    HAS,
-    IS,
-    CAN;
+    TO_BE,
+    TO_HAVE,
+    TO_CAN;
+
+    public String getValue() {
+        return getMessageKey("verb");
+    }
 
     public String getNegation() {
-        return getMessageKey("guess.game.session.negation.verb");
+        return getMessageKey("negation.verb");
     }
 
     public String getInterrogation() {
-        return getMessageKey("guess.game.session.interrogation.verb");
+        return getMessageKey("interrogation.verb");
     }
 
     private String getMessageKey(String key) {

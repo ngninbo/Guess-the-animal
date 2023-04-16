@@ -1,4 +1,6 @@
-package animals.utils;
+package animals.ressource;
+
+import animals.factories.RessourceFactory;
 
 import java.util.ResourceBundle;
 
@@ -9,7 +11,7 @@ public class MessageRessource {
     private final ResourceBundle resourceBundle;
 
     {
-        this.resourceBundle = ResourceBundle.getBundle("messages");
+        this.resourceBundle = RessourceFactory.of("messages");
     }
 
     public static MessageRessource getInstance() {

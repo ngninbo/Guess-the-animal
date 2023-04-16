@@ -63,4 +63,40 @@ public abstract class TreeTraversal {
 
         return Math.min(minDepth(node.getLeft()), minDepth(node.getRight()));
     }
+
+    public Node deleteRecursive(Node node, String value) {
+
+        if (node == null) {
+            return null;
+        }
+
+        if (node.isLeaf() && value.equalsIgnoreCase(node.getValue())) {
+            return null;
+        }
+
+        if (node.getRight() != null) {
+            return deleteRecursive(node.getRight(), value);
+        }
+
+        node.setLeft(deleteRecursive(node.getLeft(), value));
+        node.setRight(deleteRecursive(node.getRight(), value));
+
+        return node;
+    }
+
+    public boolean containsNodeRecursive(Node current, String value) {
+        if (current == null) {
+            return false;
+        }
+
+        if (value.equalsIgnoreCase(current.getValue())) {
+            return true;
+        }
+
+        if (current.getLeft() != null) {
+            return containsNodeRecursive(current.getLeft(), value);
+        } else {
+            return containsNodeRecursive(current.getRight(), value);
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package animals.service;
+package animals.core;
 
 public interface Game {
 

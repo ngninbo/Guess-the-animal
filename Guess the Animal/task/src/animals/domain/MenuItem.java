@@ -1,10 +1,13 @@
 package animals.domain;
 
+import animals.ressource.MessageRessource;
+
 public enum MenuItem {
 
     PLAY,
     LIST,
     SEARCH,
+    //DELETE,
     STATISTICS,
     PRINT,
     EXIT,
@@ -13,6 +16,7 @@ public enum MenuItem {
     public static MenuItem of(int index) {
 
         if (index < 0 || index > MenuItem.size()) {
+            System.out.printf(MessageRessource.getInstance().getProperty("guess.game.session.menu.item.error").concat("\n"), MenuItem.size() - 1);
             return MenuItem.UNKNOWN;
         } else if (index == 0) {
             return MenuItem.EXIT;

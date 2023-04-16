@@ -1,8 +1,9 @@
-package animals.command;
+package animals.factories;
 
+import animals.command.*;
 import animals.domain.MenuItem;
 import animals.service.NodeService;
-import animals.utils.MessageRessource;
+import animals.ressource.MessageRessource;
 
 public class CommandFactory {
 
@@ -18,11 +19,13 @@ public class CommandFactory {
             case PLAY:
                 return new PlayCommand(nodeService);
             case LIST:
-                printChoice(menuItem);
+                //printChoice(menuItem);
                 return new ListCommand(nodeService);
             case SEARCH:
-                printChoice(menuItem);
+                //printChoice(menuItem);
                 return new SearchCommand(nodeService);
+//            case DELETE:
+//                return new DeleteCommand(nodeService);
             case STATISTICS:
                 return new StatisticCommand(nodeService);
             case PRINT:

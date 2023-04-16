@@ -1,7 +1,8 @@
 package animals.model;
 
 import animals.domain.Verb;
-import animals.utils.MessageRessource;
+import animals.ressource.PatternRessource;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -9,6 +10,9 @@ import java.util.Objects;
 public class Statement {
 
     private final String text;
+
+    @JsonIgnore
+    private static final PatternRessource patternRessource = PatternRessource.getInstance();
 
     public Statement(String text) {
         this.text = text;
@@ -20,8 +24,8 @@ public class Statement {
 
     public String negate() {
         return Arrays.stream(Verb.values())
-                .filter(verb -> text.contains(verb.name().toLowerCase()))
-                .map(verb -> text.replace(verb.name().toLowerCase(), MessageRessource.getInstance().getProperty(verb.getNegation())))
+                .filter(verb -> text.contains(patternRessource.get(verb.getValue())))
+                .map(verb -> text.replace(patternRessource.get(verb.getValue()), patternRessource.get(verb.getNegation())))
                 .findFirst()
                 .orElse(text);
     }

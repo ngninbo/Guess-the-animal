@@ -8,7 +8,1617 @@ files:
     public class Main {
     }
   learner_created: false
+- name: test/GuessAnimalTest.java
+  visible: false
+  text: |-
+    import org.hyperskill.hstest.dynamic.DynamicTest;
+    import org.hyperskill.hstest.stage.StageTest;
+    import org.hyperskill.hstest.testcase.CheckResult;
+
+    import java.io.File;
+    import java.io.IOException;
+    import java.util.Locale;
+    import java.util.stream.Stream;
+
+    public class GuessAnimalTest extends StageTest<String> {
+
+        String[] languages = new String[]{"en", "eo"};
+
+        @DynamicTest(data = "languages")
+        CheckResult testLanguages(final String language) throws IOException {
+            final var fileName = "animals" + ("en".equals(language) ? "." : "_" + language + ".");
+
+            final var locale = Locale.getDefault();
+            final var systemLanguage = System.getProperty("user.language");
+            Locale.setDefault(new Locale(language));
+            System.setProperty("user.language", language);
+
+            deleteFiles(fileName);
+            final var result = new Scenario(language).check();
+            deleteFiles(fileName);
+
+            Locale.setDefault(locale);
+            System.setProperty("user.language", systemLanguage);
+
+            return result;
+        }
+
+        private void deleteFiles(String fileName) {
+            Stream.of("yaml", "json", "xml")
+                    .map(fileName::concat)
+                    .map(File::new)
+                    .filter(File::exists)
+                    .forEach(File::delete);
+        }
+    }
+  learner_created: false
+- name: test/Scenario.java
+  visible: false
+  text: |-
+    import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+    import org.hyperskill.hstest.testcase.CheckResult;
+    import org.hyperskill.hstest.testing.TestedProgram;
+
+    import java.io.File;
+    import java.io.IOException;
+    import java.util.Map;
+    import java.util.function.Predicate;
+    import java.util.regex.Pattern;
+
+    import static java.text.MessageFormat.format;
+    import static java.util.function.Predicate.not;
+    import static org.hyperskill.hstest.testcase.CheckResult.correct;
+    import static org.hyperskill.hstest.testcase.CheckResult.wrong;
+
+    public class Scenario {
+        private TestedProgram main;
+        private String output = "";
+        private final File dataFile;
+        private final File scriptFile;
+
+        Scenario(String name) {
+            dataFile = new File("test/" + name + ".data.yaml");
+            scriptFile = new File("test/" + name + ".script.yaml");
+            System.out.println("Scenario '" + name + "' is started.");
+            System.out.println();
+        }
+
+        CheckResult check() {
+
+            final Object[][] data;
+            final String[][] script;
+
+            try {
+                data = new YAMLMapper().readValue(dataFile, String[][].class);
+                script = new YAMLMapper().readValue(scriptFile, String[][].class);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return wrong("Cannot find the files "
+                        + dataFile.getName()
+                        + " or "
+                        + scriptFile.getName()
+                        + ", looks like you deleted or renamed it. Please, revert the changes.");
+            }
+
+            for (var values : data) {
+                for (var action : script) {
+                    final var command = action[0];
+                    switch (command) {
+                        case "start":
+                            main = new TestedProgram();
+                            output = action.length == 1
+                                    ? main.start()
+                                    : main.start(format(action[1], values).split(" "));
+                            output = output.trim().toLowerCase();
+                            continue;
+                        case "input":
+                            output = main.execute(format(action[1], values)).trim().toLowerCase();
+                            continue;
+                        case "finish":
+                            if (main.isFinished()) {
+                                continue;
+                            }
+                            return wrong(format(action[1], values));
+                        default:
+                            final Map<String, Predicate<String>> validation = Map.of(
+                                    "contains", output::contains,
+                                    "not contains", not(output::contains),
+                                    "file exists", file -> new File(file).exists(),
+                                    "file delete", file -> new File(file).delete(),
+                                    "find", pattern -> Pattern.compile(pattern).matcher(output).find(),
+                                    "matches", output::matches);
+
+                            final var expected = format(action[1], values);
+                            if (validation.get(command).test(expected)) {
+                                continue;
+                            }
+                            final var feedback = format(action[2], values) + System.lineSeparator()
+                                    + "Expected " + command + ": \"" + expected + "\"" + System.lineSeparator()
+                                    + "Actual data is: \"" + output + "\".";
+                            return wrong(feedback);
+                    }
+                }
+            }
+            return correct();
+        }
+
+    }
+  learner_created: false
+- name: src/animals/command/ExitCommand.java
+  visible: true
+  text: |
+    package animals.command;
+
+    import animals.domain.GuessGameValidator;
+    import animals.domain.RandomItem;
+    import animals.service.NodeService;
+
+    public class ExitCommand implements Command {
+
+        private final NodeService nodeService;
+
+        public ExitCommand(NodeService nodeService) {
+            this.nodeService = nodeService;
+        }
+
+        @Override
+        public boolean execute() {
+
+            save();
+
+            sayGoodbye();
+
+            return false;
+        }
+
+        public void save() {
+            nodeService.saveRoot();
+        }
+
+        public void sayGoodbye() {
+            System.out.println(new RandomItem<>(GuessGameValidator.getInstance().getData().getByeOptions()).next());
+        }
+    }
+  learner_created: true
+- name: src/animals/utils/GuessInput.java
+  visible: true
+  text: |
+    package animals.utils;
+
+    import java.util.Scanner;
+    import java.util.regex.Matcher;
+    import java.util.regex.Pattern;
+
+    public class GuessInput {
+
+        public static String requestInput(String message) {
+            System.out.printf("%s%n", message);
+            Scanner scanner = new Scanner(System.in);
+            return scanner.nextLine().toLowerCase();
+        }
+
+        public static String requestFact(String firstAnimal, String secondAnimal) {
+
+            String fact = "";
+
+            while (!getMatcher(fact).find()) {
+                fact = getDistinguishingFact(firstAnimal, secondAnimal);
+            }
+
+            return fact;
+        }
+
+        private static String getDistinguishingFact(String firstAnimal, String secondAnimal) {
+            String message = MessageRessource.getInstance().getProperty("guess.game.session.distinguishing.fact.request.text");
+            System.out.printf(message, firstAnimal, secondAnimal);
+
+            return new Scanner(System.in).nextLine().replaceFirst("[!?]", ".");
+        }
+
+        public static String answer() {
+            return new Scanner(System.in).nextLine().trim().replaceFirst("[.!?]", "").toLowerCase();
+        }
+
+        public static String answer(String question) {
+            System.out.println(question);
+            return answer();
+        }
+
+        private static Matcher getMatcher(String fact) {
+            final String regex = "It (can|has|is)";
+
+            final Pattern pattern = Pattern.compile(regex, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+            return pattern.matcher(fact);
+        }
+    }
+  learner_created: true
+- name: src/animals/command/PlayCommand.java
+  visible: true
+  text: |
+    package animals.command;
+
+    import animals.domain.*;
+    import animals.model.Node;
+    import animals.service.Game;
+    import animals.service.NodeService;
+    import animals.utils.GuessInput;
+
+    public class PlayCommand implements Command, Game {
+
+        private final NodeService nodeService;
+        private final GuessGameValidator guessGameValidator = GuessGameValidator.getInstance();
+        private Node current;
+
+        public PlayCommand(NodeService nodeService) {
+            this.nodeService = nodeService;
+        }
+
+        @Override
+        public boolean execute() {
+
+            do {
+                guess();
+            } while (playAgain());
+
+            return true;
+        }
+
+        @Override
+        public void guess() {
+            String input = GuessInput.requestInput(getMessage("guess.game.session.instruction.text"));
+            this.current = nodeService.getRoot();
+            if (input.isBlank()) {
+
+                if (isGuessed()) {
+                    System.out.println(getMessage("guess.game.session.guessing.correct.text"));
+                } else {
+                    addAnimal();
+                }
+            }
+        }
+
+        public boolean playAgain() {
+            return guessGameValidator.isPositivResponse().test(GuessInput.answer(getMessage("guess.game.session.play.again.text")));
+        }
+
+        public void addAnimal() {
+            String animal = ArticleFactory.addUndefinedArticle(GuessInput.requestInput(getMessage("guess.game.session.animal.in.mind.request.text")));
+
+            String sentence = GuessInput.requestFact(current.getValue(), animal).replaceFirst("[!?]", ".");
+
+            String answer = getAnswer(String.format(getMessage("guess.game.session.statement.verification.text"), animal));
+
+            Direction direction = guessGameValidator.isPositivResponse().test(answer) ? Direction.RIGHT : Direction.LEFT;
+            addAnimal(current, sentence, animal, direction);
+
+            String question = QuestionFactory.from(sentence);
+
+            System.out.printf(getMessage("guess.game.session.facts.learned.text").concat("\n"), current.Info(), question);
+
+            System.out.println(getMessage("guess.game.session.learning.finished.text"));
+        }
+
+        public void addAnimal(Node node, final String statement, final String animal, Direction direction) {
+            nodeService.addAnimal(node, statement, animal, direction);
+        }
+
+        public boolean isGuessed() {
+            return guessGameValidator.isPositivResponse().test(askQuestion(nodeService.getRoot()));
+        }
+
+        private String askQuestion(Node node) {
+
+            if (node.isLeaf()) {
+                this.current = node;
+                return getAnswer(QuestionFactory.from(node.getValue()).trim());
+            } else {
+                boolean answer = guessGameValidator.isPositivResponse()
+                        .test(getAnswer(QuestionFactory.from(node.getValue())));
+
+                return answer ? askQuestion(node.getRight()) : askQuestion(node.getLeft());
+            }
+        }
+
+        public String getAnswer(String question) {
+
+            String answer = GuessInput.answer(question);
+
+            while (guessGameValidator.isPositivOrNegativeResponse().negate().test(answer)) {
+                answer = GuessInput.answer(new RandomItem<>(guessGameValidator.getData().getQuestions()).next());
+            }
+
+            return answer;
+        }
+    }
+  learner_created: true
+- name: src/animals/domain/FileFormat.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    import java.util.Arrays;
+    import java.util.function.Predicate;
+
+    public enum FileFormat {
+
+        JSON,
+        XML,
+        YAML;
+
+        public static FileFormat of(String type) {
+            return isValidType().test(type) ? FileFormat.valueOf(type.toUpperCase()) : FileFormat.JSON;
+        }
+
+        private static Predicate<String> isValidType() {
+            return type -> Arrays.stream(values()).anyMatch(format -> type.equalsIgnoreCase(format.name()));
+        }
+    }
+  learner_created: true
+- name: src/animals/command/StatisticCommand.java
+  visible: true
+  text: |
+    package animals.command;
+
+    import animals.model.TreeStats;
+    import animals.service.NodeService;
+
+    public class StatisticCommand implements Command {
+
+        private final NodeService nodeService;
+
+        public StatisticCommand(NodeService nodeService) {
+            this.nodeService = nodeService;
+        }
+
+        @Override
+        public boolean execute() {
+            printStatistics();
+            return true;
+        }
+
+        private void printStatistics() {
+            System.out.println(getMessage("guess.game.session.statistics.header").concat("\n"));
+            TreeStats stats = nodeService.statistics();
+            System.out.println(stats);
+        }
+    }
+  learner_created: true
+- name: src/animals/model/BinaryTree.java
+  visible: true
+  text: |
+    package animals.model;
+
+    import animals.domain.Direction;
+
+    public class BinaryTree {
+
+        private Node root;
+
+        {
+            root = new Node();
+        }
+
+        public BinaryTree() {
+        }
+
+        public Node getRoot() {
+            return root;
+        }
+
+        public void setRoot(Node root) {
+            this.root = root;
+        }
+
+        public void add(String value) {
+            root = addRecursive(root, value);
+        }
+
+        public void addAnimal(Node node, final String statement, final String animal, Direction direction) {
+            final Node newAnimal = new Node(animal);
+            final Node oldAnimal = new Node(node.getValue());
+
+            boolean isRight = Direction.RIGHT.equals(direction);
+
+            node.setValue(statement);
+            node.setRight(isRight ? newAnimal : oldAnimal);
+            node.setLeft(isRight ? oldAnimal : newAnimal);
+        }
+
+        private Node addRecursive(Node current, String value) {
+            if (current.getValue() == null && current.isLeaf()) {
+                return new Node(value);
+            }
+
+            if (value.compareToIgnoreCase(current.getValue()) < 0) {
+                current.setLeft(addRecursive(current.getLeft(), value));
+            } else if (value.compareToIgnoreCase(current.getValue()) > 0) {
+                current.setRight(addRecursive(current.getRight(), value));
+            } else {
+                // value already exists
+                return current;
+            }
+
+            return current;
+        }
+    }
+  learner_created: true
+- name: src/animals/model/TreeStats.java
+  visible: true
+  text: |
+    package animals.model;
+
+    import java.util.Objects;
+
+    public class TreeStats {
+
+        private final String root;
+        private final int nodes;
+        private int animals;
+        private final int statements;
+        private final int height;
+        private final int minDepth;
+        private final double avgDepth;
+
+        public TreeStats(String root, int nodes, int animals, int statements, int height, int minDepth, double avgDepth) {
+            this.root = root;
+            this.nodes = nodes;
+            this.animals = animals;
+            this.statements = statements;
+            this.height = height;
+            this.minDepth = minDepth;
+            this.avgDepth = avgDepth;
+        }
+
+        public String getRoot() {
+            return root;
+        }
+
+        public int getNodes() {
+            return nodes;
+        }
+
+        public int getAnimals() {
+            return animals;
+        }
+
+        public void setAnimals(int animals) {
+            this.animals = animals;
+        }
+
+        public int getStatements() {
+            return statements;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public int getMinDepth() {
+            return minDepth;
+        }
+
+        public double getAvgDepth() {
+            return avgDepth;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof TreeStats)) return false;
+            TreeStats treeStats = (TreeStats) o;
+            return getNodes() == treeStats.getNodes() && getAnimals() == treeStats.getAnimals() &&
+                    getStatements() == treeStats.getStatements() && getHeight() == treeStats.getHeight() &&
+                    getMinDepth() == treeStats.getMinDepth() && getAvgDepth() == treeStats.getAvgDepth() &&
+                    Objects.equals(getRoot(), treeStats.getRoot());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getRoot(), getNodes(), getAnimals(), getStatements(), getHeight(), getMinDepth(), getAvgDepth());
+        }
+
+        @Override
+        public String toString() {
+            return "- root node                    " + root + "\n" +
+                    "- total number of nodes        " + nodes + "\n" +
+                    "- total number of animals      " + animals + "\n" +
+                    "- total number of statements   " + statements + "\n" +
+                    "- height of the tree           " + height + "\n" +
+                    "- minimum animal's depth       " + minDepth + "\n" +
+                    "- average animal's depth       " + avgDepth;
+        }
+
+        public static class TreeStatsBuilder {
+            private String root;
+            private int nodes;
+            private int animals;
+            private int statements;
+            private int height;
+            private int minDepth;
+            private double avgDepth;
+
+            private TreeStatsBuilder() {
+            }
+
+            public TreeStatsBuilder withRoot(String root) {
+                this.root = root;
+                return this;
+            }
+
+            public TreeStatsBuilder withNodes(int nodes) {
+                this.nodes = nodes;
+                return this;
+            }
+
+            public TreeStatsBuilder withAnimals(int animals) {
+                this.animals = animals;
+                return this;
+            }
+
+            public TreeStatsBuilder withStatements(int statements) {
+                this.statements = statements;
+                return this;
+            }
+
+            public TreeStatsBuilder withHeight(int height) {
+                this.height = height;
+                return this;
+            }
+
+            public TreeStatsBuilder withMinDepth(int minDepth) {
+                this.minDepth = minDepth;
+                return this;
+            }
+
+            public TreeStatsBuilder withAvgDepth(double avgDepth) {
+                this.avgDepth = avgDepth;
+                return this;
+            }
+
+            public static TreeStatsBuilder init() {
+                return new TreeStats.TreeStatsBuilder();
+            }
+
+            public TreeStats build() {
+                return new TreeStats(root, nodes, animals, statements, height, minDepth, avgDepth);
+            }
+        }
+    }
+  learner_created: true
+- name: src/animals/model/Node.java
+  visible: true
+  text: |
+    package animals.model;
+
+    import animals.domain.ArticleFactory;
+    import com.fasterxml.jackson.annotation.JsonIgnore;
+    import com.fasterxml.jackson.annotation.JsonInclude;
+
+    import java.util.Objects;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public class Node {
+
+        private String value;
+        private Node left;
+        private Node right;
+
+        public Node() {
+        }
+
+        public Node(String value) {
+            this.value = value;
+            right = null;
+            left = null;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public Node getLeft() {
+            return left;
+        }
+
+        public void setLeft(Node left) {
+            this.left = left;
+        }
+
+        public Node getRight() {
+            return right;
+        }
+
+        public void setRight(Node right) {
+            this.right = right;
+        }
+
+        @JsonIgnore
+        public boolean isLeaf() {
+            return left == null && right == null;
+        }
+
+        @JsonIgnore
+        public String Info() {
+            final String fact = getValue().replaceFirst("It|it\\s", "").trim();
+            Statement statement = new Statement(fact);
+            return String.format("%s\n%s", getFormat(getRight(), statement.getText()), getFormat(getLeft(), statement.negate()));
+        }
+
+        @JsonIgnore
+        private String getFormat(Node leaf, String fact) {
+            return String.format("- The %s %s", ArticleFactory.removeAll(leaf.getValue()).trim(),
+                    fact.endsWith(".") ? fact : fact.concat("."));
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Node)) return false;
+            Node node = (Node) o;
+            return Objects.equals(getValue(), node.getValue()) && Objects.equals(getLeft(), node.getLeft()) &&
+                    Objects.equals(getRight(), node.getRight());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getValue(), getLeft(), getRight());
+        }
+
+        @Override
+        public String toString() {
+            return "Node{" +
+                    "value='" + value + '\'' +
+                    ", left=" + left +
+                    ", right=" + right +
+                    '}';
+        }
+    }
+  learner_created: true
+- name: src/animals/domain/Direction.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    public enum Direction {
+
+        LEFT,
+        RIGHT
+    }
+  learner_created: true
+- name: src/animals/service/NodeService.java
+  visible: true
+  text: |
+    package animals.service;
+
+    import animals.domain.Direction;
+    import animals.model.Node;
+    import animals.model.TreeStats;
+
+    import java.util.List;
+    import java.util.Stack;
+
+    public interface NodeService {
+
+        void add(String value);
+
+        void addAnimal(Node node, final String statement, final String animal, Direction direction);
+
+        boolean loadRoot();
+
+        void saveRoot();
+
+        List<String> findAllAnimals();
+
+        void printTree();
+
+        Node getRoot();
+
+        Stack<String> findAllFacts(String animal);
+
+        TreeStats statistics();
+    }
+  learner_created: true
+- name: src/animals/command/PrintCommand.java
+  visible: true
+  text: |
+    package animals.command;
+
+    import animals.service.NodeService;
+
+    public class PrintCommand implements Command {
+
+        private final NodeService nodeService;
+
+        public PrintCommand(NodeService nodeService) {
+            this.nodeService = nodeService;
+        }
+
+        @Override
+        public boolean execute() {
+            this.nodeService.printTree();
+            return true;
+        }
+    }
+  learner_created: true
+- name: src/animals/command/ListCommand.java
+  visible: true
+  text: |
+    package animals.command;
+
+    import animals.service.NodeService;
+
+    public class ListCommand implements Command {
+
+        private final NodeService nodeService;
+
+        public ListCommand(NodeService nodeService) {
+            this.nodeService = nodeService;
+        }
+
+        @Override
+        public boolean execute() {
+            System.out.println(getMessage("guess.game.session.menu.list.result"));
+            nodeService.findAllAnimals()
+                    .forEach(value -> System.out.printf(" - %s%n", value));
+            return true;
+        }
+    }
+  learner_created: true
+- name: src/main/resources/guessing.data.json
+  visible: true
+  text: |-
+    {
+      "positivesResponses": [
+        "y",
+        "yes",
+        "yeah",
+        "yep",
+        "sure",
+        "right",
+        "affirmative",
+        "correct",
+        "indeed",
+        "you bet",
+        "exactly",
+        "you said it"
+      ],
+      "negativesResponses": [
+        "n",
+        "no",
+        "no way",
+        "nah",
+        "nope",
+        "negative",
+        "i don't think so",
+        "yeah no"
+      ],
+      "questions": [
+        "I'm not sure I caught you: was it yes or no?",
+        "Funny, I still don't understand, is it yes or no?",
+        "Oh, it's too complicated for me: just tell me yes or no.",
+        "Could you please simply say yes or no?",
+        "Oh, no, don't try to confuse me: say yes or no."
+      ],
+      "byeOptions": [
+        "Bye!",
+        "Goodbye",
+        "See you soon!",
+        "See you later!",
+        "Bye! Have a good day.",
+        "Bye! Take care.",
+        "Bye! Take it easy.",
+        "It was greet to speech with you, but I've to go. Goodbye!"
+      ]
+    }
+  learner_created: true
+- name: src/animals/domain/Verb.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    public enum Verb {
+
+        HAS,
+        IS,
+        CAN;
+
+        public String getNegation() {
+            return getMessageKey("guess.game.session.negation.verb");
+        }
+
+        public String getInterrogation() {
+            return getMessageKey("guess.game.session.interrogation.verb");
+        }
+
+        private String getMessageKey(String key) {
+            return String.format("%s.%s", key, name().toLowerCase());
+        }
+    }
+  learner_created: true
+- name: src/animals/domain/RandomItem.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    import java.util.List;
+    import java.util.concurrent.ThreadLocalRandom;
+
+    public class RandomItem<T> {
+
+        private final List<T> items;
+
+        public RandomItem(List<T> items) {
+            this.items = items;
+        }
+
+        public T next() {
+            int idx = ThreadLocalRandom.current().nextInt(0, items.size() - 1);
+
+            return items.get(idx);
+        }
+    }
+  learner_created: true
+- name: src/animals/repository/NodeRepository.java
+  visible: true
+  text: |
+    package animals.repository;
+
+    import animals.domain.Direction;
+    import animals.model.BinaryTree;
+    import animals.model.Node;
+    import animals.model.TreeStats;
+
+    import java.io.IOException;
+    import java.util.List;
+    import java.util.Stack;
+
+    public interface NodeRepository {
+
+        Node load() throws IOException;
+
+        void save(BinaryTree tree) throws IOException;
+
+        List<String> findLeafNodes(Node node);
+
+        TreeStats summary(BinaryTree tree);
+
+        void update(BinaryTree tree, Node node, String statement, String animal, Direction direction);
+
+        void setRoot(BinaryTree tree) throws IOException;
+
+        List<String> findStatements(Node node);
+
+        Stack<String> findAncestors(BinaryTree tree, String animal);
+    }
+  learner_created: true
+- name: src/animals/command/Command.java
+  visible: true
+  text: |
+    package animals.command;
+
+    import animals.utils.MessageRessource;
+
+    public interface Command {
+
+        boolean execute();
+
+        default String getMessage(String key) {
+            return MessageRessource.getInstance().getProperty(key);
+        }
+    }
+  learner_created: true
+- name: src/animals/domain/MenuItem.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    public enum MenuItem {
+
+        PLAY,
+        LIST,
+        SEARCH,
+        STATISTICS,
+        PRINT,
+        EXIT,
+        UNKNOWN;
+
+        public static MenuItem of(int index) {
+
+            if (index < 0 || index > MenuItem.size()) {
+                return MenuItem.UNKNOWN;
+            } else if (index == 0) {
+                return MenuItem.EXIT;
+            } else {
+                return values()[index - 1];
+            }
+        }
+
+        public static int size() {
+            return values().length;
+        }
+
+        public String getDescription() {
+            return "guess.game.session.menu.item.".concat(name().toLowerCase());
+        }
+
+        public int computeMenuIndex() {
+            return (ordinal() + 1) % (values().length - 1);
+        }
+    }
+  learner_created: true
+- name: src/animals/service/NodeServiceImpl.java
+  visible: true
+  text: |
+    package animals.service;
+
+    import animals.domain.Direction;
+    import animals.domain.QuestionFactory;
+    import animals.model.BinaryTree;
+    import animals.model.TreeStats;
+    import animals.utils.MessageRessource;
+    import animals.model.Node;
+    import animals.repository.NodeRepository;
+
+    import java.io.IOException;
+    import java.util.List;
+    import java.util.Stack;
+
+    public class NodeServiceImpl implements NodeService {
+
+        private final BinaryTree tree = new BinaryTree();
+
+        private final NodeRepository nodeRepository;
+
+        private final MessageRessource messageRessource;
+
+        {
+            messageRessource = MessageRessource.getInstance();
+        }
+
+        public NodeServiceImpl(NodeRepository nodeRepository) {
+            this.nodeRepository = nodeRepository;
+        }
+
+        @Override
+        public void add(String value) {
+            tree.add(value);
+        }
+
+        @Override
+        public Node getRoot() {
+            return tree.getRoot();
+        }
+
+        @Override
+        public Stack<String> findAllFacts(String animal) {
+            return nodeRepository.findAncestors(tree, animal);
+        }
+
+        @Override
+        public TreeStats statistics() {
+            return nodeRepository.summary(tree);
+        }
+
+        @Override
+        public void addAnimal(Node node, final String statement, final String animal, Direction direction) {
+            nodeRepository.update(tree, node, statement, animal, direction);
+        }
+
+        @Override
+        public boolean loadRoot() {
+            try {
+                nodeRepository.setRoot(tree);
+            } catch (IOException e) {
+                System.out.println(getMessage("guess.game.session.loading.failure.text"));
+            }
+
+            return !isLeaf(tree.getRoot());
+        }
+
+        @Override
+        public void saveRoot() {
+            try {
+                nodeRepository.save(tree);
+            } catch (IOException e) {
+                System.out.println(getMessage("guess.game.session.save.failure.text"));
+            }
+        }
+
+        @Override
+        public List<String> findAllAnimals() {
+            return nodeRepository.findLeafNodes(tree.getRoot());
+        }
+
+        @Override
+        public void printTree() {
+            print();
+        }
+
+        private String getMessage(String key) {
+            return messageRessource.getProperty(key);
+        }
+
+        private void print() {
+            printNode(getRoot(), "", isLeaf(getRoot()));
+        }
+
+        private void printNode(Node node, String prefix, boolean isLeaf) {
+            if (node != null) {
+                System.out.println(prefix + (isLeaf ? "├── " : "└── ") + (isLeaf(node) ? node.getValue() : QuestionFactory.from(node.getValue())));
+                printNode(node.getRight(), prefix + (isLeaf ? "│   " : "    "), true);
+                printNode(node.getLeft(), prefix + (isLeaf ? "│   " : "    "), false);
+            }
+        }
+
+        private boolean isLeaf(Node root) {
+            return root.isLeaf();
+        }
+    }
+  learner_created: true
+- name: src/animals/domain/TreeTraversal.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    import animals.model.Node;
+
+    import java.util.LinkedList;
+    import java.util.List;
+    import java.util.Stack;
+
+    public abstract class TreeTraversal {
+
+        public abstract boolean hasAncestors(Node node, String target, Stack<String> ancestors);
+
+        public void traversePreOrder(Node node, int depth, List<Integer> leafDepths) {
+            if (node.isLeaf()) {
+                leafDepths.add(depth);
+            } else {
+                traversePreOrder(node.getRight(), depth + 1, leafDepths);
+                traversePreOrder(node.getLeft(), depth + 1, leafDepths);
+            }
+        }
+
+        public List<Node> traverseLevelOrder(Node node) {
+            List<Node> nodes = new LinkedList<>();
+            traverseLevelOrder(node, nodes);
+            return nodes;
+        }
+
+        private void traverseLevelOrder(Node node, List<Node> nodes) {
+            if (node != null) {
+                nodes.add(node);
+
+                traverseLevelOrder(node.getLeft(), nodes);
+                traverseLevelOrder(node.getRight(), nodes);
+            }
+        }
+
+        public void traversePreOrder(Node node, List<String> animals) {
+
+            if (node.isLeaf()) {
+                animals.add(node.getValue());
+            } else {
+                traversePreOrder(node.getLeft(), animals);
+                traversePreOrder(node.getRight(), animals);
+            }
+        }
+
+        public int minDepth(Node node) {
+            if (node == null) {
+                return 0;
+            }
+
+            if (node.isLeaf()) {
+                return 1;
+            }
+
+            if (node.getLeft() == null) {
+                return minDepth(node.getRight()) + 1;
+            }
+
+            if (node.getRight() == null) {
+                return minDepth(node.getLeft()) + 1;
+            }
+
+            return Math.min(minDepth(node.getLeft()), minDepth(node.getRight()));
+        }
+    }
+  learner_created: true
+- name: src/animals/command/SearchCommand.java
+  visible: true
+  text: |
+    package animals.command;
+
+    import animals.domain.ArticleFactory;
+    import animals.service.NodeService;
+    import animals.utils.GuessInput;
+
+    import java.util.Stack;
+
+    public class SearchCommand implements Command {
+
+        private final NodeService nodeService;
+
+        public SearchCommand(NodeService nodeService) {
+            this.nodeService = nodeService;
+        }
+
+        @Override
+        public boolean execute() {
+            String animal = GuessInput.requestInput(getMessage("guess.game.session.menu.item.search.query.enter.request"));
+            printFact(ArticleFactory.addUndefinedArticle(animal));
+            return true;
+        }
+
+        private void printFact(String animal) {
+            Stack<String> facts = nodeService.findAllFacts(animal);
+            animal = ArticleFactory.removeAll(animal);
+            if (facts.isEmpty()) {
+                System.out.printf(getMessage("guess.game.session.animal.fact.empty"), animal);
+                return;
+            }
+
+            printResults(animal, facts);
+        }
+
+        private void printResults(String animal, Stack<String> facts) {
+            System.out.printf(getMessage("guess.game.session.animal.fact"), animal);
+            while (!facts.isEmpty()) {
+                System.out.printf(" - %s%n", facts.pop());
+            }
+        }
+    }
+  learner_created: true
+- name: src/animals/domain/GuessingGameMenu.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    import animals.utils.MessageRessource;
+
+    import java.util.Arrays;
+    import java.util.Scanner;
+
+    public class GuessingGameMenu {
+
+        public MenuItem show() {
+            return MenuItem.of(requestOption());
+        }
+
+        public int requestOption() {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println();
+            Arrays.stream(MenuItem.values())
+                    .filter(menuItem -> !MenuItem.UNKNOWN.equals(menuItem))
+                    .forEach(menuItem -> {
+                        final String description = getProperty(menuItem.getDescription());
+                        System.out.printf("%s. %s%n", menuItem.computeMenuIndex(), description);
+                    });
+
+            return scanner.nextInt();
+        }
+
+        private String getProperty(String key) {
+            return MessageRessource.getInstance().getProperty(key);
+        }
+    }
+  learner_created: true
+- name: animal.json
+  visible: true
+  text: |-
+    {
+      "value" : "It can climbs tree",
+      "left" : {
+        "value" : "a dog"
+      },
+      "right" : {
+        "value" : "It is living in the forest",
+        "left" : {
+          "value" : "a cat"
+        },
+        "right" : {
+          "value" : "a lynx"
+        }
+      }
+    }
+  learner_created: true
+- name: src/animals/domain/Greet.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    public enum Greet {
+
+        MORNING,
+        AFTERNOON,
+        EVENING,
+        NIGHT_OWL,
+        EARLY_BIRD
+    }
+  learner_created: true
+- name: src/animals/model/Statement.java
+  visible: true
+  text: |
+    package animals.model;
+
+    import animals.domain.Verb;
+    import animals.utils.MessageRessource;
+
+    import java.util.Arrays;
+    import java.util.Objects;
+
+    public class Statement {
+
+        private final String text;
+
+        public Statement(String text) {
+            this.text = text;
+        }
+
+        public String getText() {
+            return text;
+        }
+
+        public String negate() {
+            return Arrays.stream(Verb.values())
+                    .filter(verb -> text.contains(verb.name().toLowerCase()))
+                    .map(verb -> text.replace(verb.name().toLowerCase(), MessageRessource.getInstance().getProperty(verb.getNegation())))
+                    .findFirst()
+                    .orElse(text);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Statement)) return false;
+            Statement statement = (Statement) o;
+            return Objects.equals(getText(), statement.getText());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getText());
+        }
+
+        @Override
+        public String toString() {
+            return "Sentence{" +
+                    "sentence='" + text + '\'' +
+                    '}';
+        }
+    }
+  learner_created: true
+- name: src/animals/domain/TreeLoader.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    import animals.model.BinaryTree;
+    import animals.model.Node;
+    import animals.model.Statement;
+    import animals.model.TreeStats;
+    import animals.repository.NodeRepository;
+    import com.fasterxml.jackson.databind.ObjectMapper;
+    import com.fasterxml.jackson.databind.json.JsonMapper;
+    import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+    import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+
+    import java.io.File;
+    import java.io.IOException;
+    import java.util.*;
+    import java.util.stream.Collectors;
+
+    public class TreeLoader extends TreeTraversal implements NodeRepository {
+
+        private final ObjectMapper objectMapper;
+
+        private final String filename;
+
+        private TreeLoader(FileFormat format) {
+            this.objectMapper = getObjectMapper(format);
+            this.filename = "animals.".concat(format.name().toLowerCase());
+        }
+
+        public static NodeRepository of(FileFormat format) {
+            return new TreeLoader(format);
+        }
+
+        public Node load() throws IOException {
+            return objectMapper.readValue(new File(filename), Node.class);
+        }
+
+        public void save(BinaryTree tree) throws IOException {
+            objectMapper
+                    .writerWithDefaultPrettyPrinter()
+                    .writeValue(new File(filename), tree.getRoot());
+
+        }
+
+        @Override
+        public List<String> findLeafNodes(Node root) {
+            List<String> animals = new ArrayList<>();
+            traversePreOrder(root, animals);
+            return animals.stream()
+                    .map(ArticleFactory::removeAll)
+                    .sorted(Comparator.naturalOrder())
+                    .collect(Collectors.toList());
+        }
+
+        @Override
+        public TreeStats summary(BinaryTree tree) {
+            Node root = tree.getRoot();
+            List<Integer> depths = new LinkedList<>();
+            traversePreOrder(root, 0, depths);
+            var stats = depths.stream().collect(Collectors.summarizingInt(Integer::intValue));
+
+            return TreeStats.TreeStatsBuilder.init()
+                    .withRoot(root.getValue())
+                    .withNodes(traverseLevelOrder(root).size())
+                    .withStatements(findStatements(root).size())
+                    .withAnimals(findLeafNodes(root).size())
+                    .withHeight(stats.getMax())
+                    .withMinDepth(minDepth(root))
+                    .withAvgDepth(stats.getAverage())
+                    .build();
+        }
+
+        @Override
+        public void update(BinaryTree tree, Node node, String statement, String animal, Direction direction) {
+            tree.addAnimal(node, statement, animal, direction);
+        }
+
+        @Override
+        public void setRoot(BinaryTree tree) throws IOException {
+            tree.setRoot(load());
+        }
+
+        @Override
+        public List<String> findStatements(Node root) {
+            return traverseLevelOrder(root)
+                    .stream()
+                    .filter(node -> !node.isLeaf())
+                    .map(Node::getValue)
+                    .collect(Collectors.toList());
+        }
+
+        @Override
+        public Stack<String> findAncestors(BinaryTree tree, String value) {
+
+            Stack<String> pathToValue = new Stack<>();
+
+            if (hasAncestors(tree.getRoot(), value, pathToValue)) {
+                return pathToValue;
+            }
+
+            return new Stack<>();
+        }
+
+        @Override
+        public boolean hasAncestors(Node node, String target, Stack<String> ancestors) {
+            /* base cases */
+            if (node == null)
+                return false;
+
+            if (target.equals(node.getValue())) {
+                return true;
+            }
+
+            if (hasAncestors(node.getLeft(), target, ancestors)) {
+                ancestors.addElement(new Statement(node.getValue()).negate());
+                return true;
+            }
+
+            if (hasAncestors(node.getRight(), target, ancestors)) {
+                ancestors.addElement(node.getValue());
+                return true;
+            }
+
+            return false;
+
+        }
+
+        private ObjectMapper getObjectMapper(FileFormat format) {
+            switch (format) {
+                case XML:
+                    return new XmlMapper();
+                case YAML:
+                    return new YAMLMapper();
+                default:
+                    return new JsonMapper();
+            }
+        }
+    }
+  learner_created: true
+- name: test/eo.script.yaml
+  visible: false
+  text: |+
+    #
+    # There is a scenario of parameterized test for Esperanto language.
+    #
+    ---
+    - [start, "-type {0}"] # We will test three different file formats: JSON, YAML, XML
+    - - contains
+      - "kiun beston vi plej ŝatas?"
+      - "[Esperanto] When no Knowledge Tree is created yet the program should ask for a favourite animals at first."
+    - [input, kato]
+    - - contains
+      - bonvenon al la sperta sistemo de la besto!
+      - "[Esperanto] After entering the favourite animal the program should welcome the user and represent itself as an expert system"
+
+    #
+    # Start the menu
+    #
+    - - matches
+      - (?si).*Ludi.*Listo.*Serĉi.*Kalkuli.*Eliri.*
+      - "[Esperanto] The program should display the menu"
+
+    #
+    # Let's play the game!
+    #
+    - [input, 1]
+    - - contains
+      - vi pensu pri besto, kaj mi divenos ĝin.
+      - "[Esperanto] The program should asks the user to think of an animal"
+    - - contains
+      - premu enen kiam vi pretas.
+      - "[Esperanto] The computer should make a pause before the game."
+    - [input, ""]
+
+    #
+    # After user press Enter the game started!
+    #
+    - - contains
+      - ĉu ĝi estas kato?
+      - "[Esperanto] The very first question in the very first game should undoubtedly be about a beloved animal."
+    - [input, ne] # We think of about other animal, not about the cat
+    - - contains
+      - mi rezignas. kiun beston vi havas en la kapo?
+      - "[Esperanto] If the program cannot guess the animal, it must give up."
+    - [input, hundo] # Of course, our second animal is a dog!
+    - - contains
+      - indiku fakton, kiu distingas kato de hundo
+      - "[Esperanto] The program should find out how one animal differs from another."
+    - - input
+      - ĝi povas surgrimpi arbon
+    - - contains
+      - ĉu la aserto ĝustas por la hundo?
+      - "[Esperanto] The program should clarify if the statement is correct for a dog."
+    - [input, ne]
+
+    - - contains
+      - la kato povas surgrimpi arbon
+      - The program must generate the correct fact for the first animal.
+
+    - - contains
+      - la hundo ne povas surgrimpi arbon
+      - "[Esperanto] The program must generate the correct fact for the second animal."
+
+    - - matches
+      - "(?is).*(denove|ripeti|ankoraŭ).*"
+      - "[Esperanto] The program should ask the user to play again"
+    - [input, jes] # Yes, we will play once again
+    - [input, ""] # Press ENTER
+    - - contains
+      - povas surgrimpi arbon?
+      - "[Esperanto] After the first game, the starting question should be the question of fact."
+    - [input, jes]
+    - [contains, "ĉu ĝi estas kato?", "[Esperanto] The program must assume that the animal is a cat."]
+    - - input
+      - |
+        ne
+        linko
+        ĝi loĝas en la arbaro
+        jes
+        ne
+    # We finish the game.
+    - - matches
+      - (?si).*Ludi.*Listo.*Serĉi.*Kalkuli.*Eliri.*
+      - "[Esperanto] The program should display the menu"
+    - [input, "0"] # Exit from the application
+    - - matches
+      - "(?si).*(ĝis|estis).*"
+      - "[Esperanto] How about to say goodbye to the user?"
+    - [finish, "The program should finish when user exit"]
+    - - file exists
+      - "animals_eo.{0}"
+      - "The program should save knowledge tree to animals_eo.{0} file."
+    #
+    # After the first session the program created and save the Knowledge Tree
+    # We will run the program again to make sure that all data was saved and restored correctly.
+    #
+    - [start, "-type {0}"]
+    - - not contains
+      - kiun beston vi plej ŝatas?
+      - "[Esperanto] If the tree of knowledge exists, then the program should not ask the user about his favorite animal."
+    - - contains
+      - bonvenon al la sperta sistemo de la besto!
+      - "[Esperanto] The program should immediately greet the user after starting."
+    - - matches
+      - (?si).*Ludi.*Listo.*Serĉi.*Kalkuli.*Eliri.*
+      - "[Esperanto] The program should display the menu"
+
+    #
+    # Let's check which animals are now in our knowledge tree.
+    #
+    - [input, "2"]
+    - - matches
+      - (?si).*hundo.*kato.*linko.*
+      - "[Esperanto] The program should print a list of all animals in alphabetical order."
+
+    #
+    # Check the facts about the animal
+    #
+    - [input, "3"]
+    - - find
+      - enigu .* besto
+      - "[Esperanto] The program should ask the user to enter the name of the animal"
+    - [input, linko]
+    - - contains
+      - faktoj pri la linko
+      - "[Esperanto] The program must find the animal that is in the knowledge tree."
+    - - contains
+      - ĝi povas surgrimpi arbon
+      - "[Esperanto] The program did not print the first fact about the animal"
+    - - contains
+      - ĝi loĝas en la arbaro
+      - "[Esperanto] The program did not print the second fact about the animal"
+
+    #
+    # Check the knowledge tree statistics
+    #
+    - [input, "4"]
+    - [contains, "la statistiko", "The header for the table must be printed"]
+
+    - - matches
+      - (?is).*radika nodo.*povas surgrimpi arbon.*
+      - "[Esperanto] The root element in our tree must be a statement"
+
+    - - matches
+      - (?is).*nombro de nodoj[^\\R]*5.*
+      - "[Esperanto] The total number of nodes in the tree is not counted correctly."
+
+    - - matches
+      - (?is).*nombro de bestoj[^\\R]*3.*
+      - "[Esperanto] The total number of animals in the tree is not counted correctly."
+
+    - - matches
+      - (?is).*nombro de deklaroj[^\\R]*2.*
+      - "[Esperanto] The total number of animals in the tree is not counted correctly."
+
+    - - matches
+      - (?is).*alteco de la arbo[^\\R]*2.*
+      - "[Esperanto] The tree depth was calculated incorrectly."
+
+    - - matches
+      - (?is).*minimuma profundo[^\\R]*1.*
+      - "[Esperanto] The minimum tree depth was calculated incorrectly."
+
+    - - matches
+      - (?is).*averaĝa profundo[^\\R]*1[,.]7.*
+      - "[Esperanto] The average tree depth was calculated incorrectly."
+
+    - [input, "0"] # Exit from the application
+    - [finish, "The program should finish when user exit"]
+    - - file delete
+      - "animals_eo.{0}"
+      - "[Esperanto] The test can't delete animals_eo.{0} file."
+
+
+  learner_created: false
 - name: test/en.data.yaml
+  visible: false
+  text: |-
+    ---
+    - - yaml
+    - - json
+    - - xml
+  learner_created: false
+- name: test/eo.data.yaml
   visible: false
   text: |-
     ---
@@ -197,326 +1807,418 @@ files:
 
 
   learner_created: false
-- name: test/eo.data.yaml
-  visible: false
-  text: |-
-    ---
-    - - yaml
-    - - json
-    - - xml
-  learner_created: false
-- name: test/eo.script.yaml
-  visible: false
-  text: |+
-    #
-    # There is a scenario of parameterized test for Esperanto language.
-    #
-    ---
-    - [start, "-type {0}"] # We will test three different file formats: JSON, YAML, XML
-    - - contains
-      - "kiun beston vi plej ŝatas?"
-      - "[Esperanto] When no Knowledge Tree is created yet the program should ask for a favourite animals at first."
-    - [input, kato]
-    - - contains
-      - bonvenon al la sperta sistemo de la besto!
-      - "[Esperanto] After entering the favourite animal the program should welcome the user and represent itself as an expert system"
+- name: src/animals/core/GuessingGame.java
+  visible: true
+  text: |
+    package animals.service;
 
-    #
-    # Start the menu
-    #
-    - - matches
-      - (?si).*Ludi.*Listo.*Serĉi.*Kalkuli.*Eliri.*
-      - "[Esperanto] The program should display the menu"
+    import animals.command.Command;
+    import animals.command.CommandFactory;
+    import animals.domain.*;
+    import animals.utils.GuessInput;
 
-    #
-    # Let's play the game!
-    #
-    - [input, 1]
-    - - contains
-      - vi pensu pri besto, kaj mi divenos ĝin.
-      - "[Esperanto] The program should asks the user to think of an animal"
-    - - contains
-      - premu enen kiam vi pretas.
-      - "[Esperanto] The computer should make a pause before the game."
-    - [input, ""]
+    public class GuessingGame extends GameSession {
 
-    #
-    # After user press Enter the game started!
-    #
-    - - contains
-      - ĉu ĝi estas kato?
-      - "[Esperanto] The very first question in the very first game should undoubtedly be about a beloved animal."
-    - [input, ne] # We think of about other animal, not about the cat
-    - - contains
-      - mi rezignas. kiun beston vi havas en la kapo?
-      - "[Esperanto] If the program cannot guess the animal, it must give up."
-    - [input, hundo] # Of course, our second animal is a dog!
-    - - contains
-      - indiku fakton, kiu distingas kato de hundo
-      - "[Esperanto] The program should find out how one animal differs from another."
-    - - input
-      - ĝi povas surgrimpi arbon
-    - - contains
-      - ĉu la aserto ĝustas por la hundo?
-      - "[Esperanto] The program should clarify if the statement is correct for a dog."
-    - [input, ne]
+        private final NodeService nodeService;
 
-    - - contains
-      - la kato povas surgrimpi arbon
-      - The program must generate the correct fact for the first animal.
-
-    - - contains
-      - la hundo ne povas surgrimpi arbon
-      - "[Esperanto] The program must generate the correct fact for the second animal."
-
-    - - matches
-      - "(?is).*(denove|ripeti|ankoraŭ).*"
-      - "[Esperanto] The program should ask the user to play again"
-    - [input, jes] # Yes, we will play once again
-    - [input, ""] # Press ENTER
-    - - contains
-      - povas surgrimpi arbon?
-      - "[Esperanto] After the first game, the starting question should be the question of fact."
-    - [input, jes]
-    - [contains, "ĉu ĝi estas kato?", "[Esperanto] The program must assume that the animal is a cat."]
-    - - input
-      - |
-        ne
-        linko
-        ĝi loĝas en la arbaro
-        jes
-        ne
-    # We finish the game.
-    - - matches
-      - (?si).*Ludi.*Listo.*Serĉi.*Kalkuli.*Eliri.*
-      - "[Esperanto] The program should display the menu"
-    - [input, "0"] # Exit from the application
-    - - matches
-      - "(?si).*(ĝis|estis).*"
-      - "[Esperanto] How about to say goodbye to the user?"
-    - [finish, "The program should finish when user exit"]
-    - - file exists
-      - "animals_eo.{0}"
-      - "The program should save knowledge tree to animals_eo.{0} file."
-    #
-    # After the first session the program created and save the Knowledge Tree
-    # We will run the program again to make sure that all data was saved and restored correctly.
-    #
-    - [start, "-type {0}"]
-    - - not contains
-      - kiun beston vi plej ŝatas?
-      - "[Esperanto] If the tree of knowledge exists, then the program should not ask the user about his favorite animal."
-    - - contains
-      - bonvenon al la sperta sistemo de la besto!
-      - "[Esperanto] The program should immediately greet the user after starting."
-    - - matches
-      - (?si).*Ludi.*Listo.*Serĉi.*Kalkuli.*Eliri.*
-      - "[Esperanto] The program should display the menu"
-
-    #
-    # Let's check which animals are now in our knowledge tree.
-    #
-    - [input, "2"]
-    - - matches
-      - (?si).*hundo.*kato.*linko.*
-      - "[Esperanto] The program should print a list of all animals in alphabetical order."
-
-    #
-    # Check the facts about the animal
-    #
-    - [input, "3"]
-    - - find
-      - enigu .* besto
-      - "[Esperanto] The program should ask the user to enter the name of the animal"
-    - [input, linko]
-    - - contains
-      - faktoj pri la linko
-      - "[Esperanto] The program must find the animal that is in the knowledge tree."
-    - - contains
-      - ĝi povas surgrimpi arbon
-      - "[Esperanto] The program did not print the first fact about the animal"
-    - - contains
-      - ĝi loĝas en la arbaro
-      - "[Esperanto] The program did not print the second fact about the animal"
-
-    #
-    # Check the knowledge tree statistics
-    #
-    - [input, "4"]
-    - [contains, "la statistiko", "The header for the table must be printed"]
-
-    - - matches
-      - (?is).*radika nodo.*povas surgrimpi arbon.*
-      - "[Esperanto] The root element in our tree must be a statement"
-
-    - - matches
-      - (?is).*nombro de nodoj[^\\R]*5.*
-      - "[Esperanto] The total number of nodes in the tree is not counted correctly."
-
-    - - matches
-      - (?is).*nombro de bestoj[^\\R]*3.*
-      - "[Esperanto] The total number of animals in the tree is not counted correctly."
-
-    - - matches
-      - (?is).*nombro de deklaroj[^\\R]*2.*
-      - "[Esperanto] The total number of animals in the tree is not counted correctly."
-
-    - - matches
-      - (?is).*alteco de la arbo[^\\R]*2.*
-      - "[Esperanto] The tree depth was calculated incorrectly."
-
-    - - matches
-      - (?is).*minimuma profundo[^\\R]*1.*
-      - "[Esperanto] The minimum tree depth was calculated incorrectly."
-
-    - - matches
-      - (?is).*averaĝa profundo[^\\R]*1[,.]7.*
-      - "[Esperanto] The average tree depth was calculated incorrectly."
-
-    - [input, "0"] # Exit from the application
-    - [finish, "The program should finish when user exit"]
-    - - file delete
-      - "animals_eo.{0}"
-      - "[Esperanto] The test can't delete animals_eo.{0} file."
-
-
-  learner_created: false
-- name: test/GuessAnimalTest.java
-  visible: false
-  text: |-
-    import org.hyperskill.hstest.dynamic.DynamicTest;
-    import org.hyperskill.hstest.stage.StageTest;
-    import org.hyperskill.hstest.testcase.CheckResult;
-
-    import java.io.File;
-    import java.io.IOException;
-    import java.util.Locale;
-    import java.util.stream.Stream;
-
-    public class GuessAnimalTest extends StageTest<String> {
-
-        String[] languages = new String[]{"en", "eo"};
-
-        @DynamicTest(data = "languages")
-        CheckResult testLanguages(final String language) throws IOException {
-            final var fileName = "animals" + ("en".equals(language) ? "." : "_" + language + ".");
-
-            final var locale = Locale.getDefault();
-            final var systemLanguage = System.getProperty("user.language");
-            Locale.setDefault(new Locale(language));
-            System.setProperty("user.language", language);
-
-            deleteFiles(fileName);
-            final var result = new Scenario(language).check();
-            deleteFiles(fileName);
-
-            Locale.setDefault(locale);
-            System.setProperty("user.language", systemLanguage);
-
-            return result;
+        public GuessingGame(NodeService nodeService) {
+            super();
+            this.nodeService = nodeService;
         }
 
-        private void deleteFiles(String fileName) {
-            Stream.of("yaml", "json", "xml")
-                    .map(fileName::concat)
-                    .map(File::new)
-                    .filter(File::exists)
-                    .forEach(File::delete);
-        }
-    }
-  learner_created: false
-- name: test/Scenario.java
-  visible: false
-  text: |-
-    import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-    import org.hyperskill.hstest.testcase.CheckResult;
-    import org.hyperskill.hstest.testing.TestedProgram;
-
-    import java.io.File;
-    import java.io.IOException;
-    import java.util.Map;
-    import java.util.function.Predicate;
-    import java.util.regex.Pattern;
-
-    import static java.text.MessageFormat.format;
-    import static java.util.function.Predicate.not;
-    import static org.hyperskill.hstest.testcase.CheckResult.correct;
-    import static org.hyperskill.hstest.testcase.CheckResult.wrong;
-
-    public class Scenario {
-        private TestedProgram main;
-        private String output = "";
-        private final File dataFile;
-        private final File scriptFile;
-
-        Scenario(String name) {
-            dataFile = new File("test/" + name + ".data.yaml");
-            scriptFile = new File("test/" + name + ".script.yaml");
-            System.out.println("Scenario '" + name + "' is started.");
-            System.out.println();
+        @Override
+        public void greet() {
+            String key = String.format("greeting.%s.text", GreetFactory.of().name().toLowerCase());
+            printMessage(key);
         }
 
-        CheckResult check() {
+        public boolean load() {
+            return nodeService.loadRoot();
+        }
 
-            final Object[][] data;
-            final String[][] script;
+        public void init() {
 
-            try {
-                data = new YAMLMapper().readValue(dataFile, String[][].class);
-                script = new YAMLMapper().readValue(scriptFile, String[][].class);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return wrong("Cannot find the files "
-                        + dataFile.getName()
-                        + " or "
-                        + scriptFile.getName()
-                        + ", looks like you deleted or renamed it. Please, revert the changes.");
+            if (!load()) {
+                printMessage("guess.game.session.start.text");
+                String favoriteAnimal = GuessInput.requestInput(getMessage("guess.game.session.favorite.animal.request.text"));
+                nodeService.add(ArticleFactory.addUndefinedArticle(favoriteAnimal));
             }
 
-            for (var values : data) {
-                for (var action : script) {
-                    final var command = action[0];
-                    switch (command) {
-                        case "start":
-                            main = new TestedProgram();
-                            output = action.length == 1
-                                    ? main.start()
-                                    : main.start(format(action[1], values).split(" "));
-                            output = output.trim().toLowerCase();
-                            continue;
-                        case "input":
-                            output = main.execute(format(action[1], values)).trim().toLowerCase();
-                            continue;
-                        case "finish":
-                            if (main.isFinished()) {
-                                continue;
-                            }
-                            return wrong(format(action[1], values));
-                        default:
-                            final Map<String, Predicate<String>> validation = Map.of(
-                                    "contains", output::contains,
-                                    "not contains", not(output::contains),
-                                    "file exists", file -> new File(file).exists(),
-                                    "file delete", file -> new File(file).delete(),
-                                    "find", pattern -> Pattern.compile(pattern).matcher(output).find(),
-                                    "matches", output::matches);
+            printMessage("guess.game.session.menu.welcome.display");
+            printMessage("guess.game.session.menu.display");
+        }
 
-                            final var expected = format(action[1], values);
-                            if (validation.get(command).test(expected)) {
-                                continue;
-                            }
-                            final var feedback = format(action[2], values) + System.lineSeparator()
-                                    + "Expected " + command + ": \"" + expected + "\"" + System.lineSeparator()
-                                    + "Actual data is: \"" + output + "\".";
-                            return wrong(feedback);
-                    }
+        public MenuItem displayMenu() {
+            return new GuessingGameMenu().show();
+        }
+
+        @Override
+        public boolean execute(MenuItem menuItem) {
+
+            Command command = new CommandFactory(nodeService).from(menuItem);
+
+            if (command == null) {
+                return true;
+            }
+
+            return command.execute();
+        }
+    }
+  learner_created: true
+- name: src/animals/core/GameSession.java
+  visible: true
+  text: |
+    package animals.service;
+
+    import animals.domain.MenuItem;
+    import animals.utils.MessageRessource;
+
+    public abstract class GameSession {
+
+        abstract void init();
+        abstract boolean load();
+        abstract void greet();
+        abstract MenuItem displayMenu();
+        abstract boolean execute(MenuItem menuItem);
+
+        protected MenuItem menuItem = MenuItem.UNKNOWN;
+        private final MessageRessource messageRessource = MessageRessource.getInstance();
+
+        public void start() {
+            greet();
+
+            init();
+
+            while (execute(menuItem)) {
+                menuItem = displayMenu();
+            }
+        }
+
+        protected String getMessage(String key) {
+            return messageRessource.getProperty(key);
+        }
+
+        public void printMessage(String key) {
+            System.out.println(getMessage(key));
+        }
+    }
+  learner_created: true
+- name: src/animals/core/Game.java
+  visible: true
+  text: |
+    package animals.service;
+
+    public interface Game {
+
+        void guess();
+    }
+  learner_created: true
+- name: src/animals/core/GuessGameApplication.java
+  visible: true
+  text: |
+    package animals;
+    import animals.service.GameSession;
+
+    public class GuessGameApplication implements Runnable {
+
+        private final GameSession gameSession;
+
+        public GuessGameApplication(GameSession gameSession) {
+            this.gameSession = gameSession;
+        }
+
+        protected void guess() {
+            gameSession.start();
+        }
+
+        @Override
+        public void run() {
+            start();
+        }
+
+        private void start() {
+            gameSession.start();
+        }
+    }
+  learner_created: true
+- name: src/animals/factories/ArticleFactory.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    public class ArticleFactory {
+
+        public static final String VOWELS = "eaiouy";
+        public static final String THE = "the";
+        public static final String AN = "an";
+
+        private static String of(String word) {
+            return startsWithVowel(word) ? AN : "a";
+        }
+
+        public static boolean startsWithVowel(String word) {
+            return VOWELS.indexOf(word.charAt(0)) >= 0;
+        }
+
+        public static String withArticle(String word) {
+            return String.format("%s %s", ArticleFactory.of(word), word);
+        }
+
+        /**
+         * Determine determinant of given word/text
+         * @param text {@link String}
+         * @return {@link String} - word with determinant (a/an)
+         */
+        public static String addUndefinedArticle(String text) {
+
+            if (text.matches("^(" + AN + "?\\s)\\w+$")) {
+                return text;
+            } else if (text.matches("^(" + THE + "\\s)\\w+$")){
+                text = text.split("\\s")[1];
+                return withArticle(text);
+            }
+
+            return withArticle(text);
+        }
+
+        public static String removeAll(String text) {
+
+            if (text.matches("^(" + THE + "|" + AN + "?\\s)\\w+$")) {
+                return text.split("\\s")[1];
+            }
+
+            return text;
+        }
+    }
+  learner_created: true
+- name: src/animals/factories/GreetFactory.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    import java.time.LocalTime;
+
+    public class GreetFactory {
+
+        public static Greet of() {
+            LocalTime time = LocalTime.now();
+            LocalTime beginOfDay = LocalTime.parse("05:00:00");
+            LocalTime eob = LocalTime.parse("18:00:00");
+            Greet greet = null;
+            if (time.isAfter(beginOfDay) && time.isBefore(LocalTime.NOON)) {
+                greet = Greet.MORNING;
+            } else if (time.isAfter(LocalTime.NOON) && time.isBefore(eob)) {
+                greet = Greet.AFTERNOON;
+            } else if (time.isAfter(eob)) {
+                greet = Greet.EVENING;
+            } else if (time.isAfter(LocalTime.MIDNIGHT) && time.isBefore(beginOfDay)) {
+                greet = Greet.NIGHT_OWL;
+            } else if (time.isAfter(beginOfDay) && time.getHour() < 9) {
+                greet = Greet.EARLY_BIRD;
+            }
+
+            return greet;
+        }
+    }
+  learner_created: true
+- name: src/animals/factories/QuestionFactory.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    import animals.utils.MessageRessource;
+
+    public class QuestionFactory {
+
+        private static final MessageRessource MESSAGE_RESSOURCE = MessageRessource.getInstance();
+
+        /**
+         * Transform fact about animal to a question
+         * @param fact {@link String} - Known fact about animal
+         * @return {@link String} - Question helping to distinguish an animal
+         */
+        public static String from(String fact) {
+
+            if (!fact.matches("(It|it) (can|has|is).*")) {
+                final String tmp = String.join(" ", MESSAGE_RESSOURCE.getProperty(Verb.IS.getInterrogation()), fact).replace(".", "?");
+                return tmp.endsWith(".") ? tmp.replace(".", "?") : tmp.concat("?");
+            }
+
+            String question = fact.replaceFirst("It|it ", "").trim();
+
+            for (Verb verb : Verb.values()) {
+                if (question.contains(verb.name().toLowerCase())) {
+                    question = question.replace(verb.name().toLowerCase(), MESSAGE_RESSOURCE.getProperty(verb.getInterrogation()));
+                    break;
                 }
             }
-            return correct();
+
+            return question.endsWith(".") ? question.replace(".", "?") : question.concat("?");
+        }
+    }
+  learner_created: true
+- name: src/animals/factories/CommandFactory.java
+  visible: true
+  text: |
+    package animals.command;
+
+    import animals.domain.MenuItem;
+    import animals.service.NodeService;
+    import animals.utils.MessageRessource;
+
+    public class CommandFactory {
+
+        private final NodeService nodeService;
+
+        public CommandFactory(NodeService nodeService) {
+            this.nodeService = nodeService;
         }
 
+        public Command from(MenuItem menuItem) {
+
+            switch (menuItem) {
+                case PLAY:
+                    return new PlayCommand(nodeService);
+                case LIST:
+                    printChoice(menuItem);
+                    return new ListCommand(nodeService);
+                case SEARCH:
+                    printChoice(menuItem);
+                    return new SearchCommand(nodeService);
+                case STATISTICS:
+                    return new StatisticCommand(nodeService);
+                case PRINT:
+                    return new PrintCommand(nodeService);
+                case EXIT:
+                    return new ExitCommand(nodeService);
+                default:
+                    //throw new IllegalArgumentException("Unknown command");
+            }
+
+            return null;
+        }
+
+        private void printChoice(MenuItem menuItem) {
+            System.out.println(MessageRessource.getInstance().getProperty("guess.game.session.menu.item.choice"));
+            System.out.println(menuItem.ordinal() + 1);
+        }
     }
-  learner_created: false
+  learner_created: true
+- name: src/animals/factories/ObjectMapperFactory.java
+  visible: true
+  learner_created: true
+- name: src/animals/ressource/GuessGameRessource.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    import animals.utils.GuessingData;
+    import com.fasterxml.jackson.databind.ObjectMapper;
+
+    import java.io.IOException;
+    import java.io.InputStream;
+    import java.util.function.Predicate;
+
+    public class GuessGameValidator {
+
+        private static final GuessGameValidator INSTANCE = new GuessGameValidator();
+
+        private GuessingData data;
+
+        private GuessGameValidator() {
+            loadData();
+        }
+
+        public static GuessGameValidator getInstance() {
+            return INSTANCE;
+        }
+
+        public GuessingData getData() {
+            return data;
+        }
+
+        public Predicate<String> isPositivResponse() {
+            return data.getPositivesResponses()::contains;
+        }
+
+        public Predicate<String> isPositivOrNegativeResponse() {
+            return answer -> isPositivResponse().or(isNegativResponse()).test(answer);
+        }
+
+        public Predicate<String> isNegativResponse() {
+            return data.getNegativesResponses()::contains;
+        }
+
+        private void loadData() {
+            try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("guessing.data.json")) {
+                ObjectMapper mapper = new ObjectMapper();
+                data = mapper.readValue(inputStream, GuessingData.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+  learner_created: true
+- name: src/animals/ressource/MessageRessource.java
+  visible: true
+  text: |
+    package animals.utils;
+
+    import java.util.ResourceBundle;
+
+    public class MessageRessource {
+
+        private static final MessageRessource INSTANCE = new MessageRessource();
+
+        private final ResourceBundle resourceBundle;
+
+        {
+            this.resourceBundle = ResourceBundle.getBundle("messages");
+        }
+
+        public static MessageRessource getInstance() {
+            return INSTANCE;
+        }
+
+        public String getProperty(String key) {
+            return resourceBundle.getString(key);
+        }
+    }
+  learner_created: true
+- name: src/main/resources/messages.properties
+  visible: true
+  learner_created: true
+- name: src/main/resources/messages_eo.properties
+  visible: true
+  learner_created: true
+- name: src/main/resources/patterns.properties
+  visible: true
+  learner_created: true
+- name: src/main/resources/application.xml
+  visible: true
+  learner_created: true
+- name: src/main/resources/patterns_eo.properties
+  visible: true
+  learner_created: true
+- name: src/animals/factories/RessourceFactory.java
+  visible: true
+  learner_created: true
+- name: src/animals/ressource/PatternRessource.java
+  visible: true
+  learner_created: true
+- name: src/animals/command/DeleteCommand.java
+  visible: true
+  learner_created: true
+- name: src/animals/domain/GuessGameValidator.java
+  visible: true
+  learner_created: true
+- name: animals_test.yaml
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11084#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
+    Academy</a> to continue learning.
+  time: Sun, 16 Apr 2023 18:30:50 UTC
 record: -1

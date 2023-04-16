@@ -1,12 +1,12 @@
 package animals.service;
 
 import animals.domain.Direction;
-import animals.domain.QuestionFactory;
+import animals.factories.QuestionFactory;
 import animals.model.BinaryTree;
 import animals.model.TreeStats;
-import animals.utils.MessageRessource;
 import animals.model.Node;
 import animals.repository.NodeRepository;
+import animals.ressource.MessageRessource;
 
 import java.io.IOException;
 import java.util.List;
@@ -46,6 +46,11 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public TreeStats statistics() {
         return nodeRepository.summary(tree);
+    }
+
+    @Override
+    public boolean delete(String animal) {
+        return nodeRepository.remove(animal, tree);
     }
 
     @Override
@@ -93,7 +98,7 @@ public class NodeServiceImpl implements NodeService {
 
     private void printNode(Node node, String prefix, boolean isLeaf) {
         if (node != null) {
-            System.out.println(prefix + (isLeaf ? "├── " : "└── ") + (isLeaf(node) ? node.getValue() : QuestionFactory.from(node.getValue())));
+            System.out.println(prefix + (isLeaf ? "├─ " : "└─ ") + (isLeaf(node) ? node.getValue() : QuestionFactory.from(node.getValue())));
             printNode(node.getRight(), prefix + (isLeaf ? "│   " : "    "), true);
             printNode(node.getLeft(), prefix + (isLeaf ? "│   " : "    "), false);
         }

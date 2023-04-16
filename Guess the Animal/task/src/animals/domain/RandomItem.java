@@ -1,19 +1,18 @@
 package animals.domain;
 
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomItem<T> {
 
-    private final List<T> items;
+    private final T[] items;
 
-    public RandomItem(List<T> items) {
+    public RandomItem(T[] items) {
         this.items = items;
     }
 
     public T next() {
-        int idx = ThreadLocalRandom.current().nextInt(0, items.size() - 1);
+        int idx = ThreadLocalRandom.current().nextInt(0, items.length - 1);
 
-        return items.get(idx);
+        return items[idx];
     }
 }

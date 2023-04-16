@@ -1,8 +1,11 @@
-package animals.service;
+package animals.core;
 
 import animals.command.Command;
-import animals.command.CommandFactory;
+import animals.factories.CommandFactory;
 import animals.domain.*;
+import animals.factories.ArticleFactory;
+import animals.factories.GreetFactory;
+import animals.service.NodeService;
 import animals.utils.GuessInput;
 
 public class GuessingGame extends GameSession {
@@ -16,7 +19,7 @@ public class GuessingGame extends GameSession {
 
     @Override
     public void greet() {
-        String key = String.format("greeting.%s.text", GreetFactory.of().name().toLowerCase());
+        String key = String.format("guess.game.greeting.%s.text", GreetFactory.of().name().toLowerCase());
         printMessage(key);
     }
 

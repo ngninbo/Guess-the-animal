@@ -26,4 +26,6 @@ public interface NodeService {
     Stack<String> findAllFacts(String animal);
 
     TreeStats statistics();
+
+    boolean delete(String animal);
 }

@@ -1,0 +1,14 @@
+---
+value: "ĝi povas surgrimpi arbon"
+left:
+  value: "ĝi povas pugnobati la ovojn"
+  left:
+    value: "ĝi povas naĝi"
+    left:
+      value: "kato"
+    right:
+      value: "fisho"
+  right:
+    value: "kokido"
+right:
+  value: "hundo"

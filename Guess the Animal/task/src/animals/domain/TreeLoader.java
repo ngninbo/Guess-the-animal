@@ -1,17 +1,18 @@
 package animals.domain;
 
+import animals.factories.ArticleFactory;
+import animals.factories.ObjectMapperFactory;
 import animals.model.BinaryTree;
 import animals.model.Node;
 import animals.model.Statement;
 import animals.model.TreeStats;
 import animals.repository.NodeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,8 +23,9 @@ public class TreeLoader extends TreeTraversal implements NodeRepository {
     private final String filename;
 
     private TreeLoader(FileFormat format) {
-        this.objectMapper = getObjectMapper(format);
-        this.filename = "animals.".concat(format.name().toLowerCase());
+        this.objectMapper = ObjectMapperFactory.of(format);
+        var language = Locale.getDefault().getLanguage();
+        this.filename = "animals" + ("en".equals(language) ? "." : "_" + language + ".").concat(format.name().toLowerCase());
     }
 
     public static NodeRepository of(FileFormat format) {
@@ -65,7 +67,7 @@ public class TreeLoader extends TreeTraversal implements NodeRepository {
                 .withAnimals(findLeafNodes(root).size())
                 .withHeight(stats.getMax())
                 .withMinDepth(minDepth(root))
-                .withAvgDepth(stats.getAverage())
+                .withAvgDepth(BigDecimal.valueOf(stats.getAverage()).setScale(1, RoundingMode.HALF_UP).doubleValue())
                 .build();
     }
 
@@ -101,6 +103,17 @@ public class TreeLoader extends TreeTraversal implements NodeRepository {
     }
 
     @Override
+    public boolean remove(String animal, BinaryTree tree) {
+
+        if (containsNodeRecursive(tree.getRoot(), animal)) {
+            deleteRecursive(tree.getRoot(), animal);
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean hasAncestors(Node node, String target, Stack<String> ancestors) {
         /* base cases */
         if (node == null)
@@ -122,16 +135,5 @@ public class TreeLoader extends TreeTraversal implements NodeRepository {
 
         return false;
 
-    }
-
-    private ObjectMapper getObjectMapper(FileFormat format) {
-        switch (format) {
-            case XML:
-                return new XmlMapper();
-            case YAML:
-                return new YAMLMapper();
-            default:
-                return new JsonMapper();
-        }
     }
 }

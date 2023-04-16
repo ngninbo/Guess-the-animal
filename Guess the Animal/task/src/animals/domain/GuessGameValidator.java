@@ -1,48 +1,44 @@
 package animals.domain;
 
-import animals.utils.GuessingData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import animals.ressource.PatternRessource;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 public class GuessGameValidator {
 
     private static final GuessGameValidator INSTANCE = new GuessGameValidator();
 
-    private GuessingData data;
-
     private GuessGameValidator() {
-        loadData();
     }
 
     public static GuessGameValidator getInstance() {
         return INSTANCE;
     }
 
-    public GuessingData getData() {
-        return data;
+    public Predicate<String> isPositivResponse() {
+        return answer -> matches("answer.positive", answer);
     }
 
-    public Predicate<String> isPositivResponse() {
-        return data.getPositivesResponses()::contains;
+    public Predicate<String> isNegativeResponse() {
+        return answer -> matches("answer.negative", answer);
     }
 
     public Predicate<String> isPositivOrNegativeResponse() {
-        return answer -> isPositivResponse().or(isNegativResponse()).test(answer);
+        return answer -> isPositivResponse().or(isNegativeResponse()).test(answer);
     }
 
-    public Predicate<String> isNegativResponse() {
-        return data.getNegativesResponses()::contains;
+    public boolean matches(String pattern, String text) {
+        return pattern(pattern).matcher(text).matches();
     }
 
-    private void loadData() {
-        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("guessing.data.json")) {
-            ObjectMapper mapper = new ObjectMapper();
-            data = mapper.readValue(inputStream, GuessingData.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public BiFunction<String, String, Boolean> matches() {
+        return (pattern, text) -> pattern(pattern).matcher(text).matches();
+    }
+
+    public Pattern pattern(String pattern) {
+        String regex = PatternRessource.getInstance().get(pattern);
+        return Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
     }
 }

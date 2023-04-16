@@ -72,13 +72,15 @@ public class TreeStats {
 
     @Override
     public String toString() {
-        return "- root node                    " + root + "\n" +
-                "- total number of nodes        " + nodes + "\n" +
-                "- total number of animals      " + animals + "\n" +
-                "- total number of statements   " + statements + "\n" +
-                "- height of the tree           " + height + "\n" +
-                "- minimum animal's depth       " + minDepth + "\n" +
-                "- average animal's depth       " + avgDepth;
+        return "TreeStats{" +
+                "root='" + root + '\'' +
+                ", nodes=" + nodes +
+                ", animals=" + animals +
+                ", statements=" + statements +
+                ", height=" + height +
+                ", minDepth=" + minDepth +
+                ", avgDepth=" + avgDepth +
+                '}';
     }
 
     public static class TreeStatsBuilder {

@@ -1,6 +1,6 @@
 package animals.command;
 
-import animals.utils.MessageRessource;
+import animals.ressource.MessageRessource;
 
 public interface Command {
 

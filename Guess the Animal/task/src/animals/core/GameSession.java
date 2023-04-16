@@ -1,7 +1,7 @@
-package animals.service;
+package animals.core;
 
 import animals.domain.MenuItem;
-import animals.utils.MessageRessource;
+import animals.ressource.MessageRessource;
 
 public abstract class GameSession {
 

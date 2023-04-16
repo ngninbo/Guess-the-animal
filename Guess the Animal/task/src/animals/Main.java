@@ -1,8 +1,9 @@
 package animals;
 
+import animals.core.GuessGameApplication;
 import animals.domain.FileFormat;
 import animals.domain.TreeLoader;
-import animals.service.GuessingGame;
+import animals.core.GuessingGame;
 import animals.service.NodeServiceImpl;
 
 public class Main {

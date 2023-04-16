@@ -1,7 +1,7 @@
 package animals.command;
 
-import animals.domain.GuessGameValidator;
 import animals.domain.RandomItem;
+import animals.ressource.MessageRessource;
 import animals.service.NodeService;
 
 public class ExitCommand implements Command {
@@ -27,6 +27,6 @@ public class ExitCommand implements Command {
     }
 
     public void sayGoodbye() {
-        System.out.println(new RandomItem<>(GuessGameValidator.getInstance().getData().getByeOptions()).next());
+        System.out.println(new RandomItem<>(MessageRessource.getInstance().getProperty("guess.game.session.farewell").split("\f")).next());
     }
 }

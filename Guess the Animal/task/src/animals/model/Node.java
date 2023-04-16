@@ -1,9 +1,11 @@
 package animals.model;
 
-import animals.domain.ArticleFactory;
+import animals.factories.ArticleFactory;
+import animals.ressource.PatternRessource;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.text.MessageFormat;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -12,6 +14,9 @@ public class Node {
     private String value;
     private Node left;
     private Node right;
+
+    @JsonIgnore
+    private final PatternRessource patternRessource = PatternRessource.getInstance();
 
     public Node() {
     }
@@ -53,14 +58,15 @@ public class Node {
 
     @JsonIgnore
     public String Info() {
-        final String fact = getValue().replaceFirst("It|it\\s", "").trim();
+        final String fact = getValue().replaceFirst(patternRessource.get("statement_replace.pattern"), "").trim();
         Statement statement = new Statement(fact);
-        return String.format("%s\n%s", getFormat(getRight(), statement.getText()), getFormat(getLeft(), statement.negate()));
+
+        return getFormat(getRight(), fact).concat("\n") + getFormat(getLeft(), statement.negate());
     }
 
     @JsonIgnore
     private String getFormat(Node leaf, String fact) {
-        return String.format("- The %s %s", ArticleFactory.removeAll(leaf.getValue()).trim(),
+        return MessageFormat.format(patternRessource.get("animals.facts.print.pattern"), ArticleFactory.removeAll(leaf.getValue()).trim(),
                 fact.endsWith(".") ? fact : fact.concat("."));
     }
 

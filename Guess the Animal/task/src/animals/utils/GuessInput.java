@@ -1,13 +1,16 @@
 package animals.utils;
 
+import animals.domain.GuessGameValidator;
+import animals.ressource.MessageRessource;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class GuessInput {
 
-    public static String requestInput(String message) {
-        System.out.printf("%s%n", message);
+    public static String requestInput(String... messages) {
+        Arrays.stream(messages).forEach(System.out::println);
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine().toLowerCase();
     }
@@ -16,16 +19,17 @@ public class GuessInput {
 
         String fact = "";
 
-        while (!getMatcher(fact).find()) {
+        while (!GuessGameValidator.getInstance().matches().apply("animals.facts.correct.pattern", fact)) {
             fact = getDistinguishingFact(firstAnimal, secondAnimal);
         }
 
         return fact;
     }
 
-    private static String getDistinguishingFact(String firstAnimal, String secondAnimal) {
+    public static String getDistinguishingFact(String firstAnimal, String secondAnimal) {
         String message = MessageRessource.getInstance().getProperty("guess.game.session.distinguishing.fact.request.text");
-        System.out.printf(message, firstAnimal, secondAnimal);
+        //System.out.printf(message, firstAnimal, secondAnimal);
+        System.out.println(MessageFormat.format(message, firstAnimal, secondAnimal));
 
         return new Scanner(System.in).nextLine().replaceFirst("[!?]", ".");
     }
@@ -37,12 +41,5 @@ public class GuessInput {
     public static String answer(String question) {
         System.out.println(question);
         return answer();
-    }
-
-    private static Matcher getMatcher(String fact) {
-        final String regex = "It (can|has|is)";
-
-        final Pattern pattern = Pattern.compile(regex, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(fact);
     }
 }

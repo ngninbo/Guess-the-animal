@@ -1,5 +1,4 @@
-package animals;
-import animals.service.GameSession;
+package animals.core;
 
 public class GuessGameApplication implements Runnable {
 
@@ -9,16 +8,8 @@ public class GuessGameApplication implements Runnable {
         this.gameSession = gameSession;
     }
 
-    protected void guess() {
-        gameSession.start();
-    }
-
     @Override
     public void run() {
-        start();
-    }
-
-    private void start() {
         gameSession.start();
     }
 }

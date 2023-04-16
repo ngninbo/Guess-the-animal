@@ -1,7 +1,9 @@
 package animals.domain;
 
-import animals.utils.MessageRessource;
+import animals.ressource.MessageRessource;
+import animals.ressource.PatternRessource;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -13,15 +15,19 @@ public class GuessingGameMenu {
 
     public int requestOption() {
         Scanner scanner = new Scanner(System.in);
+        displayOptions();
+
+        return scanner.nextInt();
+    }
+
+    private void displayOptions() {
         System.out.println();
         Arrays.stream(MenuItem.values())
                 .filter(menuItem -> !MenuItem.UNKNOWN.equals(menuItem))
                 .forEach(menuItem -> {
                     final String description = getProperty(menuItem.getDescription());
-                    System.out.printf("%s. %s%n", menuItem.computeMenuIndex(), description);
+                    System.out.println(MessageFormat.format(PatternRessource.getInstance().get("menu.print.pattern"), menuItem.computeMenuIndex(), description));
                 });
-
-        return scanner.nextInt();
     }
 
     private String getProperty(String key) {
