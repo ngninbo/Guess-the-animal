@@ -1807,64 +1807,6 @@ files:
 
 
   learner_created: false
-- name: src/animals/core/GuessingGame.java
-  visible: true
-  text: |
-    package animals.service;
-
-    import animals.command.Command;
-    import animals.command.CommandFactory;
-    import animals.domain.*;
-    import animals.utils.GuessInput;
-
-    public class GuessingGame extends GameSession {
-
-        private final NodeService nodeService;
-
-        public GuessingGame(NodeService nodeService) {
-            super();
-            this.nodeService = nodeService;
-        }
-
-        @Override
-        public void greet() {
-            String key = String.format("greeting.%s.text", GreetFactory.of().name().toLowerCase());
-            printMessage(key);
-        }
-
-        public boolean load() {
-            return nodeService.loadRoot();
-        }
-
-        public void init() {
-
-            if (!load()) {
-                printMessage("guess.game.session.start.text");
-                String favoriteAnimal = GuessInput.requestInput(getMessage("guess.game.session.favorite.animal.request.text"));
-                nodeService.add(ArticleFactory.addUndefinedArticle(favoriteAnimal));
-            }
-
-            printMessage("guess.game.session.menu.welcome.display");
-            printMessage("guess.game.session.menu.display");
-        }
-
-        public MenuItem displayMenu() {
-            return new GuessingGameMenu().show();
-        }
-
-        @Override
-        public boolean execute(MenuItem menuItem) {
-
-            Command command = new CommandFactory(nodeService).from(menuItem);
-
-            if (command == null) {
-                return true;
-            }
-
-            return command.execute();
-        }
-    }
-  learner_created: true
 - name: src/animals/core/GameSession.java
   visible: true
   text: |
@@ -1911,34 +1853,6 @@ files:
     public interface Game {
 
         void guess();
-    }
-  learner_created: true
-- name: src/animals/core/GuessGameApplication.java
-  visible: true
-  text: |
-    package animals;
-    import animals.service.GameSession;
-
-    public class GuessGameApplication implements Runnable {
-
-        private final GameSession gameSession;
-
-        public GuessGameApplication(GameSession gameSession) {
-            this.gameSession = gameSession;
-        }
-
-        protected void guess() {
-            gameSession.start();
-        }
-
-        @Override
-        public void run() {
-            start();
-        }
-
-        private void start() {
-            gameSession.start();
-        }
     }
   learner_created: true
 - name: src/animals/factories/ArticleFactory.java
@@ -2107,58 +2021,6 @@ files:
 - name: src/animals/factories/ObjectMapperFactory.java
   visible: true
   learner_created: true
-- name: src/animals/ressource/GuessGameRessource.java
-  visible: true
-  text: |
-    package animals.domain;
-
-    import animals.utils.GuessingData;
-    import com.fasterxml.jackson.databind.ObjectMapper;
-
-    import java.io.IOException;
-    import java.io.InputStream;
-    import java.util.function.Predicate;
-
-    public class GuessGameValidator {
-
-        private static final GuessGameValidator INSTANCE = new GuessGameValidator();
-
-        private GuessingData data;
-
-        private GuessGameValidator() {
-            loadData();
-        }
-
-        public static GuessGameValidator getInstance() {
-            return INSTANCE;
-        }
-
-        public GuessingData getData() {
-            return data;
-        }
-
-        public Predicate<String> isPositivResponse() {
-            return data.getPositivesResponses()::contains;
-        }
-
-        public Predicate<String> isPositivOrNegativeResponse() {
-            return answer -> isPositivResponse().or(isNegativResponse()).test(answer);
-        }
-
-        public Predicate<String> isNegativResponse() {
-            return data.getNegativesResponses()::contains;
-        }
-
-        private void loadData() {
-            try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("guessing.data.json")) {
-                ObjectMapper mapper = new ObjectMapper();
-                data = mapper.readValue(inputStream, GuessingData.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-  learner_created: true
 - name: src/animals/ressource/MessageRessource.java
   visible: true
   text: |
@@ -2214,6 +2076,64 @@ files:
   learner_created: true
 - name: animals_test.yaml
   visible: true
+  learner_created: true
+- name: src/animals/core/GuessingGameApplication.java
+  visible: true
+  text: |
+    package animals.service;
+
+    import animals.command.Command;
+    import animals.command.CommandFactory;
+    import animals.domain.*;
+    import animals.utils.GuessInput;
+
+    public class GuessingGame extends GameSession {
+
+        private final NodeService nodeService;
+
+        public GuessingGame(NodeService nodeService) {
+            super();
+            this.nodeService = nodeService;
+        }
+
+        @Override
+        public void greet() {
+            String key = String.format("greeting.%s.text", GreetFactory.of().name().toLowerCase());
+            printMessage(key);
+        }
+
+        public boolean load() {
+            return nodeService.loadRoot();
+        }
+
+        public void init() {
+
+            if (!load()) {
+                printMessage("guess.game.session.start.text");
+                String favoriteAnimal = GuessInput.requestInput(getMessage("guess.game.session.favorite.animal.request.text"));
+                nodeService.add(ArticleFactory.addUndefinedArticle(favoriteAnimal));
+            }
+
+            printMessage("guess.game.session.menu.welcome.display");
+            printMessage("guess.game.session.menu.display");
+        }
+
+        public MenuItem displayMenu() {
+            return new GuessingGameMenu().show();
+        }
+
+        @Override
+        public boolean execute(MenuItem menuItem) {
+
+            Command command = new CommandFactory(nodeService).from(menuItem);
+
+            if (command == null) {
+                return true;
+            }
+
+            return command.execute();
+        }
+    }
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11084#comment
 status: Solved

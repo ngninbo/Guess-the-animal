@@ -44,6 +44,9 @@
       <module name="Guess_the_Animal.Topics-Regexes_in_programs-Safe_password.main" target="11" />
       <module name="Guess_the_Animal.Topics-Regexes_in_programs-Theory.main" target="11" />
       <module name="Guess_the_Animal.Topics-Regexes_in_programs-Vehicle_registration_number.main" target="11" />
+      <module name="Guess_the_Animal.Topics-States_of_a_thread-A_thread_in_NEW_state.main" target="11" />
+      <module name="Guess_the_Animal.Topics-States_of_a_thread-Print_name_of_TERMINATED_thread.main" target="11" />
+      <module name="Guess_the_Animal.Topics-States_of_a_thread-Theory.main" target="11" />
       <module name="Guess_the_Animal.Topics-String-Check_burgs.main" target="11" />
       <module name="Guess_the_Animal.Topics-String-Extracting_a_substring.main" target="11" />
       <module name="Guess_the_Animal.Topics-String-Replacing_'a'_with_'b'.main" target="11" />

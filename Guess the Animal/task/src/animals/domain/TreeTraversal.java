@@ -2,6 +2,8 @@ package animals.domain;
 
 import animals.model.Node;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -9,6 +11,14 @@ import java.util.Stack;
 public abstract class TreeTraversal {
 
     public abstract boolean hasAncestors(Node node, String target, Stack<String> ancestors);
+
+    public <T> int sizeOf(List<T> list) {
+        return list.size();
+    }
+
+    public double round(double value) {
+        return BigDecimal.valueOf(value).setScale(1, RoundingMode.HALF_UP).doubleValue();
+    }
 
     public void traversePreOrder(Node node, int depth, List<Integer> leafDepths) {
         if (node.isLeaf()) {

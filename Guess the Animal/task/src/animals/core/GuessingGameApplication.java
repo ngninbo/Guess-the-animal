@@ -8,11 +8,11 @@ import animals.factories.GreetFactory;
 import animals.service.NodeService;
 import animals.utils.GuessInput;
 
-public class GuessingGame extends GameSession {
+public class GuessingGameApplication extends GameSession {
 
     private final NodeService nodeService;
 
-    public GuessingGame(NodeService nodeService) {
+    public GuessingGameApplication(NodeService nodeService) {
         super();
         this.nodeService = nodeService;
     }

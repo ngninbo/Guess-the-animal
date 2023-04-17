@@ -28,7 +28,6 @@ public class GuessInput {
 
     public static String getDistinguishingFact(String firstAnimal, String secondAnimal) {
         String message = MessageRessource.getInstance().getProperty("guess.game.session.distinguishing.fact.request.text");
-        //System.out.printf(message, firstAnimal, secondAnimal);
         System.out.println(MessageFormat.format(message, firstAnimal, secondAnimal));
 
         return new Scanner(System.in).nextLine().replaceFirst("[!?]", ".");

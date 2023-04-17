@@ -19,8 +19,6 @@ public interface NodeService {
 
     List<String> findAllAnimals();
 
-    void printTree();
-
     Node getRoot();
 
     Stack<String> findAllFacts(String animal);

@@ -3,7 +3,7 @@ package animals.core;
 import animals.domain.MenuItem;
 import animals.ressource.MessageRessource;
 
-public abstract class GameSession {
+public abstract class GameSession implements Runnable {
 
     abstract void init();
     abstract boolean load();
@@ -30,5 +30,10 @@ public abstract class GameSession {
 
     public void printMessage(String key) {
         System.out.println(getMessage(key));
+    }
+
+    @Override
+    public void run() {
+        start();
     }
 }

@@ -11,8 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,7 +22,7 @@ public class TreeLoader extends TreeTraversal implements NodeRepository {
 
     private TreeLoader(FileFormat format) {
         this.objectMapper = ObjectMapperFactory.of(format);
-        var language = Locale.getDefault().getLanguage();
+        String language = Locale.getDefault().getLanguage();
         this.filename = "animals" + ("en".equals(language) ? "." : "_" + language + ".").concat(format.name().toLowerCase());
     }
 
@@ -62,12 +60,12 @@ public class TreeLoader extends TreeTraversal implements NodeRepository {
 
         return TreeStats.TreeStatsBuilder.init()
                 .withRoot(root.getValue())
-                .withNodes(traverseLevelOrder(root).size())
-                .withStatements(findStatements(root).size())
-                .withAnimals(findLeafNodes(root).size())
+                .withNodes(sizeOf(traverseLevelOrder(root)))
+                .withStatements(sizeOf(findStatements(root)))
+                .withAnimals(sizeOf(findLeafNodes(root)))
                 .withHeight(stats.getMax())
                 .withMinDepth(minDepth(root))
-                .withAvgDepth(BigDecimal.valueOf(stats.getAverage()).setScale(1, RoundingMode.HALF_UP).doubleValue())
+                .withAvgDepth(round(stats.getAverage()))
                 .build();
     }
 

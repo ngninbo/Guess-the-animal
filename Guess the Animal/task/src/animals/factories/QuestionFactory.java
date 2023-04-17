@@ -5,11 +5,12 @@ import animals.ressource.MessageRessource;
 import animals.ressource.PatternRessource;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Locale;
 
 public class QuestionFactory {
 
-    private static final PatternRessource patternRessource = PatternRessource.getInstance();
+    private static final PatternRessource PATTERN_RESSOURCE = PatternRessource.getInstance();
 
     /**
      * Transform fact about animal to a question
@@ -18,16 +19,16 @@ public class QuestionFactory {
      */
     public static String from(String fact) {
 
-        if (!fact.matches(patternRessource.get("animals.facts.correct.pattern"))) {
-            final String tmp = String.join(" ", patternRessource.get(Verb.TO_BE.getInterrogation()), fact).replace(".", "?");
+        if (!fact.matches(PATTERN_RESSOURCE.get("animals.facts.correct.pattern"))) {
+            final String tmp = String.join(" ", PATTERN_RESSOURCE.get(Verb.TO_BE.getInterrogation()), fact).replace(".", "?");
             return tmp.endsWith(".") ? tmp.replace(".", "?") : tmp.concat("?");
         }
 
-        String question = fact.replaceFirst(patternRessource.get("statement_replace.pattern"), "").trim();
+        String question = fact.replaceFirst(PATTERN_RESSOURCE.get("statement_replace.pattern"), "").trim();
 
         for (Verb verb : Verb.values()) {
-            if (question.contains(patternRessource.get(verb.getValue()))) {
-                question = question.replace(patternRessource.get(verb.getValue()), patternRessource.get(verb.getInterrogation()));
+            if (question.contains(PATTERN_RESSOURCE.get(verb.getValue()))) {
+                question = question.replace(PATTERN_RESSOURCE.get(verb.getValue()), PATTERN_RESSOURCE.get(verb.getInterrogation()));
                 break;
             }
         }
@@ -38,7 +39,7 @@ public class QuestionFactory {
     public static String verify(String animal) {
 
         if ("eo".equals(Locale.getDefault().getLanguage())) {
-            animal = MessageFormat.format(PatternRessource.getInstance().get("animal.article_3_replace"), animal);
+            animal = MessageFormat.format(PATTERN_RESSOURCE.get("animal.article_3_replace"), animal);
         }
 
 
