@@ -1,7 +1,11 @@
 ---
 value: "It is a mammal"
 left:
-  value: "a shark"
+  value: "It is leaving in water."
+  left:
+    value: "a shark"
+  right:
+    value: "a fish"
 right:
   value: "It is leaving in the forest"
   left:

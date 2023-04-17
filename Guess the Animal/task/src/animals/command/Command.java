@@ -6,7 +6,7 @@ public interface Command {
 
     boolean execute();
 
-    default String getMessage(String key) {
-        return MessageRessource.getInstance().getProperty(key);
+    default String format(String msgKey, Object... values) {
+        return MessageRessource.getInstance().format(msgKey, values).concat("\n");
     }
 }

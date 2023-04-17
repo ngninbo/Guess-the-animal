@@ -26,6 +26,6 @@ public class ExitCommand implements Command {
     }
 
     public void sayGoodbye() {
-        System.out.println(new RandomItem<>(getMessage("guess.game.session.farewell").split("\f")).next());
+        System.out.println(new RandomItem<>(format("guess.game.session.farewell").split("\f")).next());
     }
 }

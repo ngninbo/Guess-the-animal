@@ -2,6 +2,7 @@ package animals.ressource;
 
 import animals.factories.RessourceFactory;
 
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 public class MessageRessource {
@@ -20,5 +21,9 @@ public class MessageRessource {
 
     public String getProperty(String key) {
         return resourceBundle.getString(key);
+    }
+
+    public String format(String messageKey, Object... values) {
+        return MessageFormat.format(getProperty(messageKey), values);
     }
 }

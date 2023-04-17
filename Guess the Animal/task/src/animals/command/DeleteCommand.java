@@ -19,11 +19,11 @@ public class DeleteCommand implements Command {
         String animal = getAnimal();
 
         if (animal.equals(nodeService.getRoot().getValue())) {
-            System.out.println(getMessage("guess.game.session.tree.delete.root"));
+            System.out.println(format("guess.game.session.tree.delete.root"));
         } else if (nodeService.delete(animal)) {
-            System.out.printf(getMessage("guess.game.session.tree.delete.successful").concat("%n"), ArticleFactory.removeAll(animal));
+            System.out.println(format("guess.game.session.tree.delete.successful", ArticleFactory.removeAll(animal)));
         } else {
-            System.out.printf(getMessage("guess.game.session.tree.delete.fail").concat("%n"), ArticleFactory.removeAll(animal));
+            System.out.println(format("guess.game.session.tree.delete.fail", ArticleFactory.removeAll(animal)));
         }
 
         return true;
@@ -31,10 +31,10 @@ public class DeleteCommand implements Command {
 
     private String getAnimal() {
 
-        String animal = GuessInput.requestInput(getMessage("guess.game.session.animal.prompt"));
+        String animal = GuessInput.requestInput(format("guess.game.session.animal.prompt"));
 
         while(!GuessGameValidator.getInstance().matches("animal.1.pattern", animal)) {
-            System.out.println(getMessage("guess.game.session.animal.error"));
+            System.out.println(format("guess.game.session.animal.error"));
             animal = GuessInput.requestInput();
         }
 

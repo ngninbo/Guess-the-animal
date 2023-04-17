@@ -16,7 +16,7 @@ public class SearchCommand implements Command {
 
     @Override
     public boolean execute() {
-        String animal = GuessInput.requestInput(getMessage("guess.game.session.animal.prompt"));
+        String animal = GuessInput.requestInput(format("guess.game.session.animal.prompt"));
         printFact(ArticleFactory.addUndefinedArticle(animal));
         return true;
     }
@@ -25,7 +25,7 @@ public class SearchCommand implements Command {
         Stack<String> facts = nodeService.findAllFacts(animal);
         animal = ArticleFactory.removeAll(animal);
         if (facts.isEmpty()) {
-            System.out.printf(getMessage("guess.game.session.tree.search.noFacts").concat("%n"), animal);
+            System.out.print(format("guess.game.session.tree.search.noFacts", animal));
             return;
         }
 
@@ -33,9 +33,9 @@ public class SearchCommand implements Command {
     }
 
     private void printResults(String animal, Stack<String> facts) {
-        System.out.printf(getMessage("guess.game.session.tree.search.facts").concat("%n"), animal);
+        System.out.print(format("guess.game.session.tree.search.facts", animal));
         while (!facts.isEmpty()) {
-            System.out.printf(getMessage("guess.game.session.tree.search.printf"), facts.pop());
+            System.out.print(format("guess.game.session.tree.search.printf", facts.pop()));
         }
     }
 }

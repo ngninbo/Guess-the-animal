@@ -8,7 +8,7 @@ import animals.core.Game;
 import animals.service.NodeService;
 import animals.utils.GuessInput;
 
-public class PlayCommand implements Command, Game {
+public class PlayCommand implements Game {
 
     private final NodeService nodeService;
     private final GuessGameValidator validator = GuessGameValidator.getInstance();
@@ -25,19 +25,19 @@ public class PlayCommand implements Command, Game {
             guess();
         } while (playAgain());
 
-        System.out.println(new RandomItem<>(getMessage("guess.game.session.thanks").split("\f")).next());
+        System.out.println(new RandomItem<>(format("guess.game.session.thanks").split("\f")).next());
 
         return true;
     }
 
     @Override
     public void guess() {
-        String input = GuessInput.requestInput(getMessage("guess.game.session.instruction.text"));
+        String input = GuessInput.requestInput(format("guess.game.session.instruction.text"));
         this.current = nodeService.getRoot();
         if (input.isBlank()) {
 
             if (isGuessed()) {
-                System.out.println(getMessage("guess.game.session.guessing.correct.text"));
+                System.out.println(format("guess.game.session.guessing.correct.text"));
             } else {
                 addAnimal();
             }
@@ -46,11 +46,11 @@ public class PlayCommand implements Command, Game {
 
     public boolean playAgain() {
         return validator.isPositivResponse()
-                .test(GuessInput.answer(new RandomItem<>(getMessage("guess.game.session.play.again.text").split("\f")).next()));
+                .test(GuessInput.answer(new RandomItem<>(format("guess.game.session.play.again.text").split("\f")).next()));
     }
 
     public void addAnimal() {
-        String animal = ArticleFactory.addUndefinedArticle(GuessInput.requestInput(getMessage("guess.game.session.animal.in.mind.request.text")));
+        String animal = ArticleFactory.addUndefinedArticle(GuessInput.requestInput(format("guess.game.session.animal.in.mind.request.text")));
 
         String sentence = GuessInput.requestFact(current.getValue(), animal).replaceFirst("[!?]", ".");
 
@@ -61,9 +61,9 @@ public class PlayCommand implements Command, Game {
 
         String question = QuestionFactory.from(sentence);
 
-        System.out.printf(getMessage("guess.game.session.facts.learned.text").concat("\n"), current.Info(), question);
-        System.out.println(new RandomItem<>(getMessage("guess.game.session.animal.nice").split("\f")).next()
-                .concat(getMessage("guess.game.session.learning.finished.text")));
+        System.out.print(format("guess.game.session.facts.learned.text", current.Info(), question));
+        System.out.println(new RandomItem<>(format("guess.game.session.animal.nice").split("\f")).next()
+                .concat(format("guess.game.session.learning.finished.text")));
     }
 
     public void addAnimal(Node node, final String statement, final String animal, Direction direction) {
@@ -91,7 +91,7 @@ public class PlayCommand implements Command, Game {
         String answer = GuessInput.answer(question);
 
         while (validator.isPositivOrNegativeResponse().negate().test(answer)) {
-            answer = GuessInput.answer(new RandomItem<>(getMessage("guess.game.session.ask.again").split("\f")).next());
+            answer = GuessInput.answer(new RandomItem<>(format("guess.game.session.ask.again").split("\f")).next());
         }
 
         return answer;

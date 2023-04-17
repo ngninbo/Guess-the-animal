@@ -1,39 +1,60 @@
 package animals.core;
 
+import animals.command.Command;
+import animals.domain.GuessingGameMenu;
 import animals.domain.MenuItem;
-import animals.ressource.MessageRessource;
+import animals.factories.ArticleFactory;
+import animals.factories.CommandFactory;
+import animals.factories.GreetFactory;
+import animals.service.NodeService;
+import animals.utils.GuessInput;
 
-public abstract class GameSession implements Runnable {
+public class GameSession extends GuessingGame {
 
-    abstract void init();
-    abstract boolean load();
-    abstract void greet();
-    abstract MenuItem displayMenu();
-    abstract boolean execute(MenuItem menuItem);
+    private final NodeService nodeService;
 
-    protected MenuItem menuItem = MenuItem.UNKNOWN;
-    private final MessageRessource messageRessource = MessageRessource.getInstance();
-
-    public void start() {
-        greet();
-
-        init();
-
-        while (execute(menuItem)) {
-            menuItem = displayMenu();
-        }
-    }
-
-    protected String getMessage(String key) {
-        return messageRessource.getProperty(key);
-    }
-
-    public void printMessage(String key) {
-        System.out.println(getMessage(key));
+    public GameSession(NodeService nodeService) {
+        this.nodeService = nodeService;
     }
 
     @Override
-    public void run() {
-        start();
+    protected void greet() {
+        String key = String.format("guess.game.greeting.%s.text", GreetFactory.of().name().toLowerCase());
+        printMessage(key);
+    }
+
+    @Override
+    protected boolean load() {
+        return nodeService.loadRoot();
+    }
+
+    @Override
+    protected void init() {
+
+        if (!load()) {
+            printMessage("guess.game.session.start.text");
+            String favoriteAnimal = GuessInput.requestInput(getMessage("guess.game.session.favorite.animal.request.text"));
+            nodeService.add(ArticleFactory.addUndefinedArticle(favoriteAnimal));
+        }
+
+        printMessage("guess.game.session.menu.welcome.display");
+        printMessage("guess.game.session.menu.display");
+    }
+
+    @Override
+    protected MenuItem displayMenu() {
+        return new GuessingGameMenu().show();
+    }
+
+    @Override
+    protected boolean execute(MenuItem menuItem) {
+
+        Command command = new CommandFactory(nodeService).from(menuItem);
+
+        if (command == null) {
+            return true;
+        }
+
+        return command.execute();
     }
 }

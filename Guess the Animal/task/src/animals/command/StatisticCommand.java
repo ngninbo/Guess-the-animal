@@ -18,21 +18,18 @@ public class StatisticCommand implements Command {
     }
 
     private void printStatistics() {
-        System.out.println(getMessage("guess.game.session.statistics.title").concat("\n"));
+        System.out.print(format("guess.game.session.statistics.title"));
         TreeStats stats = nodeService.statistics();
 
-        var out = new StringBuilder();
-
-        out
-                .append(String.format(getMessage("guess.game.session.statistics.root").concat("%n"), stats.getRoot()))
-                .append(String.format(getMessage("guess.game.session.statistics.nodes").concat("%n"), stats.getNodes()))
-                .append(String.format(getMessage("guess.game.session.statistics.animals").concat("%n"), stats.getAnimals()))
-                .append(String.format(getMessage("guess.game.session.statistics.statements").concat("%n"), stats.getStatements()))
-                .append(String.format(getMessage("guess.game.session.statistics.height").concat("%n"), stats.getHeight()))
-                .append(String.format(getMessage("guess.game.session.statistics.minimum").concat("%n"), stats.getMinDepth()))
-                .append(String.format(getMessage("guess.game.session.statistics.average").concat("%n"), stats.getAvgDepth()));
+        String out = format("guess.game.session.statistics.root", stats.getRoot()) +
+                format("guess.game.session.statistics.nodes", stats.getNodes()) +
+                format("guess.game.session.statistics.animals", stats.getAnimals()) +
+                format("guess.game.session.statistics.statements", stats.getStatements()) +
+                format("guess.game.session.statistics.height", stats.getHeight()) +
+                format("guess.game.session.statistics.minimum", stats.getMinDepth()) +
+                format("guess.game.session.statistics.average", stats.getAvgDepth());
 
 
-        System.out.printf("%s", out);
+        System.out.println(out);
     }
 }

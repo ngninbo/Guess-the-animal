@@ -3,14 +3,13 @@ package animals.utils;
 import animals.domain.GuessGameValidator;
 import animals.ressource.MessageRessource;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class GuessInput {
 
     public static String requestInput(String... messages) {
-        Arrays.stream(messages).forEach(System.out::println);
+        Arrays.stream(messages).forEach(System.out::print);
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine().toLowerCase();
     }
@@ -27,8 +26,7 @@ public class GuessInput {
     }
 
     public static String getDistinguishingFact(String firstAnimal, String secondAnimal) {
-        String message = MessageRessource.getInstance().getProperty("guess.game.session.distinguishing.fact.request.text");
-        System.out.println(MessageFormat.format(message, firstAnimal, secondAnimal));
+        System.out.println(MessageRessource.getInstance().format("guess.game.session.distinguishing.fact.request.text", firstAnimal, secondAnimal));
 
         return new Scanner(System.in).nextLine().replaceFirst("[!?]", ".");
     }
