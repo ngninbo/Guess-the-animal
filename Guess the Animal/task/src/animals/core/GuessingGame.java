@@ -24,7 +24,7 @@ public abstract class GuessingGame {
     }
 
     protected String getMessage(String key) {
-        return MessageRessource.getInstance().getProperty(key);
+        return MessageRessource.getInstance().format(key);
     }
 
     public void printMessage(String key) {

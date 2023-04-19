@@ -34,13 +34,13 @@ public class GreetFactory {
     private static boolean isEarlyBird(LocalTime time) {
         LocalTime earlyStart = LocalTime.parse(MESSAGE_RESSOURCE.getProperty("guess.game.session.early.time.start"));
         LocalTime earlyEnd = LocalTime.parse(MESSAGE_RESSOURCE.getProperty("guess.game.session.early.time.end"));
-        return time.isAfter(earlyStart) && time.isBefore(earlyEnd);
+        return isBetween(earlyStart, earlyEnd, time);
     }
 
     private static boolean isNightOwl(LocalTime time) {
         LocalTime nightStart = LocalTime.parse(MESSAGE_RESSOURCE.getProperty("guess.game.session.night.time.start"));
         LocalTime nightEnd = LocalTime.parse(MESSAGE_RESSOURCE.getProperty("guess.game.session.night.time.end"));
-        return time.isAfter(nightStart) && time.isBefore(nightEnd);
+        return isBetween(nightStart, nightEnd, time);
     }
 
     private static boolean isEvening(LocalTime time) {
@@ -51,12 +51,16 @@ public class GreetFactory {
     private static boolean isMorning(LocalTime time) {
         LocalTime morningStart = LocalTime.parse(MESSAGE_RESSOURCE.getProperty("guess.game.session.morning.time.start"));
         LocalTime morningEnd = LocalTime.parse(MESSAGE_RESSOURCE.getProperty("guess.game.session.morning.time.end"));
-        return time.isAfter(morningStart) && time.isBefore(morningEnd);
+        return isBetween(morningStart, morningEnd, time);
     }
     
     private static boolean isAfternoon(LocalTime time) {
         LocalTime afternoonEnd = LocalTime.parse(MESSAGE_RESSOURCE.getProperty("guess.game.session.afternoon.time.end"));
         LocalTime afternoonStart = LocalTime.parse(MESSAGE_RESSOURCE.getProperty("guess.game.session.afternoon.time.start"));
-        return time.isAfter(afternoonStart) && time.isBefore(afternoonEnd);
+        return isBetween(afternoonStart, afternoonEnd, time);
+    }
+
+    private static boolean isBetween(LocalTime start, LocalTime end, LocalTime time) {
+        return time.isAfter(start) && time.isBefore(end);
     }
 }

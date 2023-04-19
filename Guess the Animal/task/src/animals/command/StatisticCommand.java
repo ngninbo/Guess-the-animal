@@ -13,13 +13,12 @@ public class StatisticCommand implements Command {
 
     @Override
     public boolean execute() {
-        printStatistics();
+        printStatistics(nodeService.statistics());
         return true;
     }
 
-    private void printStatistics() {
+    private void printStatistics(TreeStats stats) {
         System.out.print(format("guess.game.session.statistics.title"));
-        TreeStats stats = nodeService.statistics();
 
         String out = format("guess.game.session.statistics.root", stats.getRoot()) +
                 format("guess.game.session.statistics.nodes", stats.getNodes()) +

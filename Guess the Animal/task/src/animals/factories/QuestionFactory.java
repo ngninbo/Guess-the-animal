@@ -5,7 +5,6 @@ import animals.ressource.MessageRessource;
 import animals.ressource.PatternRessource;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Locale;
 
 public class QuestionFactory {
