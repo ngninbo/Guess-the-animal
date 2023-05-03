@@ -16,4 +16,9 @@ public enum FileFormat {
     private static Predicate<String> isValidType() {
         return type -> Arrays.stream(values()).anyMatch(format -> type.equalsIgnoreCase(format.name()));
     }
+
+    @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }

@@ -23,7 +23,7 @@ public class TreeLoader extends TreeTraversal implements NodeRepository {
     private TreeLoader(FileFormat format) {
         this.objectMapper = ObjectMapperFactory.of(format);
         String language = Locale.getDefault().getLanguage();
-        this.filename = "animals" + ("en".equals(language) ? "." : "_" + language + ".").concat(format.name().toLowerCase());
+        this.filename = "animals" + ("en".equals(language) ? "." : "_" + language + ".").concat(format.toString());
     }
 
     public static NodeRepository of(FileFormat format) {

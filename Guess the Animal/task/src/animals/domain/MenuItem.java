@@ -1,6 +1,12 @@
 package animals.domain;
 
 import animals.ressource.MessageRessource;
+import animals.ressource.PatternRessource;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public enum MenuItem {
 
@@ -13,10 +19,12 @@ public enum MenuItem {
     EXIT,
     UNKNOWN;
 
-    public static MenuItem of(int index) {
+    public static MenuItem from(int index) {
 
-        if (index < 0 || index > MenuItem.size()) {
-            System.out.println(MessageRessource.getInstance().format("guess.game.session.menu.item.error", MenuItem.size() - 1));
+        int length = MenuItem.values().length;
+
+        if (index < 0 || index > length) {
+            System.out.println(MessageRessource.getInstance().format("guess.game.session.menu.item.error", length - 1));
             return MenuItem.UNKNOWN;
         } else if (index == 0) {
             return MenuItem.EXIT;
@@ -25,15 +33,23 @@ public enum MenuItem {
         }
     }
 
-    public static int size() {
-        return values().length;
-    }
-
     public String getDescription() {
         return "guess.game.session.menu.item.".concat(name().toLowerCase());
     }
 
-    public int computeMenuIndex() {
+    public int getIndex() {
         return (ordinal() + 1) % (values().length - 1);
+    }
+
+    public static List<String> getItems() {
+        return Arrays.stream(MenuItem.values())
+                .filter(menuItem -> !MenuItem.UNKNOWN.equals(menuItem))
+                .map(MenuItem::format)
+                .collect(Collectors.toList());
+    }
+
+    private String format() {
+        return MessageFormat.format(PatternRessource.getInstance().get("menu.print.pattern"),
+                getIndex(), MessageRessource.getInstance().getProperty(getDescription()));
     }
 }

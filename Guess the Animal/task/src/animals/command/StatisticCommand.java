@@ -18,7 +18,7 @@ public class StatisticCommand implements Command {
     }
 
     private void printStatistics(TreeStats stats) {
-        System.out.print(format("guess.game.session.statistics.title"));
+        System.out.println(format("guess.game.session.statistics.title"));
 
         String out = format("guess.game.session.statistics.root", stats.getRoot()) +
                 format("guess.game.session.statistics.nodes", stats.getNodes()) +
@@ -29,6 +29,6 @@ public class StatisticCommand implements Command {
                 format("guess.game.session.statistics.average", stats.getAvgDepth());
 
 
-        System.out.println(out);
+        System.out.print(out);
     }
 }

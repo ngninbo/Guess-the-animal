@@ -9,6 +9,8 @@ import animals.factories.GreetFactory;
 import animals.service.NodeService;
 import animals.utils.GuessInput;
 
+import java.util.Scanner;
+
 public class GameSession extends GuessingGame {
 
     private final NodeService nodeService;
@@ -43,7 +45,9 @@ public class GameSession extends GuessingGame {
 
     @Override
     protected MenuItem displayMenu() {
-        return new GuessingGameMenu().show();
+        System.out.println();
+        MenuItem.getItems().forEach(System.out::println);
+        return MenuItem.from(new Scanner(System.in).nextInt());
     }
 
     @Override
