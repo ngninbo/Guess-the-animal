@@ -1,7 +1,6 @@
 package animals.core;
 
 import animals.command.Command;
-import animals.domain.GuessingGameMenu;
 import animals.domain.MenuItem;
 import animals.factories.ArticleFactory;
 import animals.factories.CommandFactory;
