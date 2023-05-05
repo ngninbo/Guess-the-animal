@@ -24,7 +24,7 @@ public enum MenuItem {
         int length = MenuItem.values().length;
 
         if (index < 0 || index > length) {
-            System.out.println(MessageRessource.getInstance().format("guess.game.session.menu.item.error", length - 1));
+            System.out.println(MessageRessource.getInstance().format("guess.game.session.menu.item.error", length - 2));
             return MenuItem.UNKNOWN;
         } else if (index == 0) {
             return MenuItem.EXIT;

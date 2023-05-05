@@ -3,7 +3,6 @@ package animals.factories;
 import animals.command.*;
 import animals.domain.MenuItem;
 import animals.service.NodeService;
-import animals.ressource.MessageRessource;
 
 public class CommandFactory {
 
@@ -19,10 +18,8 @@ public class CommandFactory {
             case PLAY:
                 return new PlayCommand(nodeService);
             case LIST:
-                //printChoice(menuItem);
                 return new ListCommand(nodeService);
             case SEARCH:
-                //printChoice(menuItem);
                 return new SearchCommand(nodeService);
 //            case DELETE:
 //                return new DeleteCommand(nodeService);
@@ -37,10 +34,5 @@ public class CommandFactory {
         }
 
         return null;
-    }
-
-    private void printChoice(MenuItem menuItem) {
-        System.out.println(MessageRessource.getInstance().getProperty("guess.game.session.menu.item.choice"));
-        System.out.println(menuItem.ordinal() + 1);
     }
 }
