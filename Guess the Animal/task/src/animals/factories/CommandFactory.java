@@ -30,9 +30,7 @@ public class CommandFactory {
             case EXIT:
                 return new ExitCommand(nodeService);
             default:
-                //throw new IllegalArgumentException("Unknown command");
+                return null;
         }
-
-        return null;
     }
 }

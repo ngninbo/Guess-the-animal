@@ -8,6 +8,7 @@ import animals.factories.GreetFactory;
 import animals.service.NodeService;
 import animals.utils.GuessInput;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 public class GameSession extends GuessingGame {
@@ -51,13 +52,8 @@ public class GameSession extends GuessingGame {
 
     @Override
     protected boolean execute(MenuItem menuItem) {
-
-        Command command = new CommandFactory(nodeService).from(menuItem);
-
-        if (command == null) {
-            return true;
-        }
-
-        return command.execute();
+        return Optional.ofNullable(new CommandFactory(nodeService).from(menuItem))
+                .map(Command::execute)
+                .orElse(true);
     }
 }
