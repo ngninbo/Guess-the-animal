@@ -58,14 +58,14 @@ public class TreeLoader extends TreeTraversal implements NodeRepository {
         traversePreOrder(root, 0, depths);
         var stats = depths.stream().collect(Collectors.summarizingInt(Integer::intValue));
 
-        return TreeStats.TreeStatsBuilder.init()
-                .withRoot(root.getValue())
-                .withNodes(sizeOf(traverseLevelOrder(root)))
-                .withStatements(sizeOf(findStatements(root)))
-                .withAnimals(sizeOf(findLeafNodes(root)))
-                .withHeight(stats.getMax())
-                .withMinDepth(minDepth(root))
-                .withAvgDepth(round(stats.getAverage()))
+        return TreeStats.builder()
+                .root(root.getValue())
+                .nodes(sizeOf(traverseLevelOrder(root)))
+                .statements(sizeOf(findStatements(root)))
+                .animals(sizeOf(findLeafNodes(root)))
+                .height(stats.getMax())
+                .minDepth(minDepth(root))
+                .avgDepth(round(stats.getAverage()))
                 .build();
     }
 

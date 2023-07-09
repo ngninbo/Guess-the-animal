@@ -2,24 +2,23 @@ package animals.model;
 
 import animals.domain.Verb;
 import animals.ressource.PatternRessource;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Arrays;
-import java.util.Objects;
 
+@EqualsAndHashCode
+@ToString
 public class Statement {
 
-    private final String text;
-
-    @JsonIgnore
     private static final PatternRessource patternRessource = PatternRessource.getInstance();
+
+    @Getter
+    private final String text;
 
     public Statement(String text) {
         this.text = text;
-    }
-
-    public String getText() {
-        return text;
     }
 
     public String negate() {
@@ -28,25 +27,5 @@ public class Statement {
                 .map(verb -> text.replace(patternRessource.get(verb.getValue()), patternRessource.get(verb.getNegation())))
                 .findFirst()
                 .orElse(text);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Statement)) return false;
-        Statement statement = (Statement) o;
-        return Objects.equals(getText(), statement.getText());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getText());
-    }
-
-    @Override
-    public String toString() {
-        return "Sentence{" +
-                "sentence='" + text + '\'' +
-                '}';
     }
 }

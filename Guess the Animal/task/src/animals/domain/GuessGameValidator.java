@@ -1,17 +1,16 @@
 package animals.domain;
 
 import animals.ressource.PatternRessource;
+import lombok.NoArgsConstructor;
 
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+@NoArgsConstructor
 public class GuessGameValidator {
 
     private static final GuessGameValidator INSTANCE = new GuessGameValidator();
-
-    private GuessGameValidator() {
-    }
 
     public static GuessGameValidator getInstance() {
         return INSTANCE;

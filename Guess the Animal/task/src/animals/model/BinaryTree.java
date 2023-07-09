@@ -1,25 +1,16 @@
 package animals.model;
 
 import animals.domain.Direction;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
 public class BinaryTree {
 
-    private Node root;
-
-    {
-        root = new Node();
-    }
-
-    public BinaryTree() {
-    }
-
-    public Node getRoot() {
-        return root;
-    }
-
-    public void setRoot(Node root) {
-        this.root = root;
-    }
+    @Getter
+    @Setter
+    private Node root = new Node();
 
     public void add(String value) {
         root = addRecursive(root, value);

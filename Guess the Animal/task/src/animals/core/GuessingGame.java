@@ -23,11 +23,11 @@ public abstract class GuessingGame {
         }
     }
 
-    protected String getMessage(String key) {
-        return MessageRessource.getInstance().format(key);
+    protected String getMessage(String key, Object... args) {
+        return MessageRessource.getInstance().format(key, args);
     }
 
-    public void printMessage(String key) {
-        System.out.println(getMessage(key));
+    public void printMessage(String key, Object... args) {
+        System.out.println(getMessage(key, args));
     }
 }

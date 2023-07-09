@@ -45,9 +45,17 @@ public class GameSession extends GuessingGame {
 
     @Override
     protected MenuItem displayMenu() {
-        System.out.println();
-        MenuItem.getItems().forEach(System.out::println);
-        return MenuItem.from(new Scanner(System.in).nextInt());
+
+        try {
+            System.out.println();
+            MenuItem.getItems().forEach(System.out::println);
+            return MenuItem.from(new Scanner(System.in).nextInt());
+        } catch (Exception e) {
+            System.out.println();
+            printMessage("guess.game.session.menu.item.error", MenuItem.getLength() - 2);
+        }
+
+        return MenuItem.UNKNOWN;
     }
 
     @Override

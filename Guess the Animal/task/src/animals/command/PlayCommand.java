@@ -61,7 +61,7 @@ public class PlayCommand implements Game {
 
         String question = QuestionFactory.from(sentence);
 
-        System.out.print(format("guess.game.session.facts.learned.text", current.Info(), question));
+        System.out.print(format("guess.game.session.facts.learned.text", NodeInfo.of(current), question));
         System.out.println(new RandomItem<>(format("guess.game.session.animal.nice").split("\f")).next()
                 .concat(format("guess.game.session.learning.finished.text")));
     }

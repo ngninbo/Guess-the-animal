@@ -19,9 +19,13 @@ public enum MenuItem {
     EXIT,
     UNKNOWN;
 
+    public static int getLength() {
+        return MenuItem.values().length;
+    }
+
     public static MenuItem from(int index) {
 
-        int length = MenuItem.values().length;
+        int length = getLength();
 
         if (index < 0 || index > length) {
             System.out.println(MessageRessource.getInstance().format("guess.game.session.menu.item.error", length - 2));
