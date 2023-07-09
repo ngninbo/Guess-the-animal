@@ -20,14 +20,8 @@ public class StatisticCommand implements Command {
     private void printStatistics(TreeStats stats) {
         System.out.println(format("guess.game.session.statistics.title"));
 
-        String out = format("guess.game.session.statistics.root", stats.getRoot()) +
-                format("guess.game.session.statistics.nodes", stats.getNodes()) +
-                format("guess.game.session.statistics.animals", stats.getAnimals()) +
-                format("guess.game.session.statistics.statements", stats.getStatements()) +
-                format("guess.game.session.statistics.height", stats.getHeight()) +
-                format("guess.game.session.statistics.minimum", stats.getMinDepth()) +
-                format("guess.game.session.statistics.average", stats.getAvgDepth());
-
+        String out = format("guess.game.session.statistics.overview", stats.getRoot(), stats.getNodes(),
+                stats.getAnimals(), stats.getStatements(), stats.getHeight(), stats.getMinDepth(), stats.getAvgDepth());
 
         System.out.print(out);
     }
