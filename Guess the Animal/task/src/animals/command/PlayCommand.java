@@ -56,8 +56,8 @@ public class PlayCommand implements Game {
 
         String answer = getAnswer(QuestionFactory.verify(animal));
 
-        Direction direction = validator.isPositivResponse().test(answer) ? Direction.RIGHT : Direction.LEFT;
-        addAnimal(current, sentence, animal, direction);
+        NodePath nodePath = validator.isPositivResponse().test(answer) ? NodePath.RIGHT : NodePath.LEFT;
+        addAnimal(current, sentence, animal, nodePath);
 
         String question = QuestionFactory.from(sentence);
 
@@ -66,8 +66,8 @@ public class PlayCommand implements Game {
                 .concat(format("guess.game.session.learning.finished.text")));
     }
 
-    public void addAnimal(Node node, final String statement, final String animal, Direction direction) {
-        nodeService.addAnimal(node, statement, animal, direction);
+    public void addAnimal(Node node, final String statement, final String animal, NodePath nodePath) {
+        nodeService.update(node, statement, new Node(animal), nodePath);
     }
 
     public boolean isGuessed() {

@@ -1,6 +1,6 @@
 package animals.service;
 
-import animals.domain.Direction;
+import animals.domain.NodePath;
 import animals.model.Node;
 import animals.model.TreeStats;
 
@@ -11,7 +11,7 @@ public interface NodeService {
 
     void add(String value);
 
-    void addAnimal(Node node, final String statement, final String animal, Direction direction);
+    void update(Node node, String statement, Node child, NodePath nodePath);
 
     boolean loadRoot();
 

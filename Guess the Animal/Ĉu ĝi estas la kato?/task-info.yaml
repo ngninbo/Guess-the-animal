@@ -678,17 +678,6 @@ files:
         }
     }
   learner_created: true
-- name: src/animals/domain/Direction.java
-  visible: true
-  text: |
-    package animals.domain;
-
-    public enum Direction {
-
-        LEFT,
-        RIGHT
-    }
-  learner_created: true
 - name: src/animals/service/NodeService.java
   visible: true
   text: |
@@ -1171,40 +1160,6 @@ files:
             while (!facts.isEmpty()) {
                 System.out.printf(" - %s%n", facts.pop());
             }
-        }
-    }
-  learner_created: true
-- name: src/animals/domain/GuessingGameMenu.java
-  visible: true
-  text: |
-    package animals.domain;
-
-    import animals.utils.MessageRessource;
-
-    import java.util.Arrays;
-    import java.util.Scanner;
-
-    public class GuessingGameMenu {
-
-        public MenuItem show() {
-            return MenuItem.of(requestOption());
-        }
-
-        public int requestOption() {
-            Scanner scanner = new Scanner(System.in);
-            System.out.println();
-            Arrays.stream(MenuItem.values())
-                    .filter(menuItem -> !MenuItem.UNKNOWN.equals(menuItem))
-                    .forEach(menuItem -> {
-                        final String description = getProperty(menuItem.getDescription());
-                        System.out.printf("%s. %s%n", menuItem.computeMenuIndex(), description);
-                    });
-
-            return scanner.nextInt();
-        }
-
-        private String getProperty(String key) {
-            return MessageRessource.getInstance().getProperty(key);
         }
     }
   learner_created: true
@@ -2140,6 +2095,20 @@ files:
   learner_created: true
 - name: src/animals/ressource/MessageFormatter.java
   visible: true
+  learner_created: true
+- name: src/animals/domain/NodeInfo.java
+  visible: true
+  learner_created: true
+- name: src/animals/domain/NodePath.java
+  visible: true
+  text: |
+    package animals.domain;
+
+    public enum Direction {
+
+        LEFT,
+        RIGHT
+    }
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11084#comment
 status: Solved

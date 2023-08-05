@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/418381/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: Fri, 05 May 2023 12:04:04 UTC
+update_date: Sat, 05 Aug 2023 09:48:54 UTC
 stages:
 - id: 703
   step: 11079
@@ -25,20 +25,30 @@ stages:
   is_completed: true
 topics:
   0:
-  - title: Write, compile, and run
-    theory_id: 3739
-  - title: Units of information
-    theory_id: 6865
   - title: Computer algorithms
     theory_id: 16547
-  - title: Immutability
-    theory_id: 7929
   - title: The big O notation
     theory_id: 16699
   - title: Best, average and worst cases
     theory_id: 20084
   - title: Data structures
     theory_id: 16927
+  - title: Units of information
+    theory_id: 6865
+  - title: Write, compile, and run
+    theory_id: 3739
+  - title: Pseudocode
+    theory_id: 15090
+  - title: Pseudocode basics
+    theory_id: 19510
+  - title: Complex constructions in pseudocode
+    theory_id: 20922
+  - title: Fixed-size array
+    theory_id: 20078
+  - title: Immutability
+    theory_id: 7929
+  - title: Dynamic array
+    theory_id: 5357
   - title: Computer programming
     theory_id: 8739
   - title: Paradigms
@@ -121,16 +131,6 @@ topics:
     theory_id: 3614
   - title: Package
     theory_id: 3621
-  - title: Pseudocode
-    theory_id: 15090
-  - title: Pseudocode basics
-    theory_id: 19510
-  - title: Complex constructions in pseudocode
-    theory_id: 20922
-  - title: Fixed-size array
-    theory_id: 20078
-  - title: Dynamic array
-    theory_id: 5357
   - title: Processing strings
     theory_id: 3551
   - title: Intro to computational thinking
@@ -225,19 +225,19 @@ topics:
   - title: Debugging techniques
     theory_id: 13775
   2:
-  - title: Recursion basics
-    theory_id: 5984
   - title: Graph
     theory_id: 15967
+  - title: Recursion basics
+    theory_id: 5984
   - title: Tree
     theory_id: 5121
   - title: Binary search tree
     theory_id: 5169
   3:
-  - title: JVM, JRE, and JDK
-    theory_id: 3499
   - title: IDE
     theory_id: 10996
+  - title: JVM, JRE, and JDK
+    theory_id: 3499
   - title: Introduction to Operating systems
     theory_id: 9704
   - title: Command line overview
@@ -266,6 +266,10 @@ topics:
     theory_id: 3652
   - title: Array exceptions
     theory_id: 1940
+  - title: JSON
+    theory_id: 6854
+  - title: XML
+    theory_id: 6901
   - title: IntelliJ IDEA
     theory_id: 3801
   - title: IntelliJ IDEA run configurations
@@ -276,10 +280,6 @@ topics:
     theory_id: 9723
   - title: Try with resources
     theory_id: 9734
-  - title: XML
-    theory_id: 6901
-  - title: JSON
-    theory_id: 6854
   4:
   - title: Stack
     theory_id: 5252
@@ -287,6 +287,14 @@ topics:
     theory_id: 28474
   - title: Deque
     theory_id: 18635
+  - title: 'Hashing: overview'
+    theory_id: 9831
+  - title: Hash function
+    theory_id: 30143
+  - title: Hash table
+    theory_id: 13054
+  - title: Binary heap
+    theory_id: 17070
   - title: Computer Memory
     theory_id: 18003
   - title: Components of computer memory
@@ -297,19 +305,11 @@ topics:
     theory_id: 5135
   - title: Recursion
     theory_id: 3550
+  - title: Tree traversals
+    theory_id: 7156
   - title: The Set interface
     theory_id: 3575
   - title: Stack
     theory_id: 20203
-  - title: 'Hashing: overview'
-    theory_id: 9831
-  - title: Hash function
-    theory_id: 10878
-  - title: Hash table
-    theory_id: 13054
   - title: The Map interface
     theory_id: 3558
-  - title: Binary heap
-    theory_id: 17070
-  - title: Tree traversals
-    theory_id: 7156

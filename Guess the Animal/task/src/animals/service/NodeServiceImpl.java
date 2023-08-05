@@ -1,6 +1,6 @@
 package animals.service;
 
-import animals.domain.Direction;
+import animals.domain.NodePath;
 import animals.model.BinaryTree;
 import animals.model.TreeStats;
 import animals.model.Node;
@@ -53,14 +53,14 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public void addAnimal(Node node, final String statement, final String animal, Direction direction) {
-        nodeRepository.update(tree, node, statement, animal, direction);
+    public void update(Node node, String value, Node child, NodePath nodePath) {
+        nodeRepository.update(tree, node, value, child, nodePath);
     }
 
     @Override
     public boolean loadRoot() {
         try {
-            nodeRepository.setRoot(tree);
+            nodeRepository.loadRoot(tree);
         } catch (IOException e) {
             System.out.println(getMessage("guess.game.session.loading.failure.text"));
         }

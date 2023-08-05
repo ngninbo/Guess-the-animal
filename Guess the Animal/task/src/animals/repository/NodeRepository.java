@@ -1,6 +1,6 @@
 package animals.repository;
 
-import animals.domain.Direction;
+import animals.domain.NodePath;
 import animals.model.BinaryTree;
 import animals.model.Node;
 import animals.model.TreeStats;
@@ -19,9 +19,9 @@ public interface NodeRepository {
 
     TreeStats summary(BinaryTree tree);
 
-    void update(BinaryTree tree, Node node, String statement, String animal, Direction direction);
+    void update(BinaryTree tree, Node node, String value, Node child, NodePath nodePath);
 
-    void setRoot(BinaryTree tree) throws IOException;
+    void loadRoot(BinaryTree tree) throws IOException;
 
     List<String> findStatements(Node node);
 

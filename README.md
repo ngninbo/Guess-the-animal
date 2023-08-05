@@ -1,2 +1,2 @@
-# Guess-the-nimal
+# Guess-the-animal
 Animal guessing application from JetBrains Academy

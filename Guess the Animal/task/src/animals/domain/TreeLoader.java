@@ -70,12 +70,12 @@ public class TreeLoader extends TreeTraversal implements NodeRepository {
     }
 
     @Override
-    public void update(BinaryTree tree, Node node, String statement, String animal, Direction direction) {
-        tree.addAnimal(node, statement, animal, direction);
+    public void update(BinaryTree tree, Node node, String value, Node child, NodePath nodePath) {
+        tree.addChild(node, value, child, nodePath);
     }
 
     @Override
-    public void setRoot(BinaryTree tree) throws IOException {
+    public void loadRoot(BinaryTree tree) throws IOException {
         tree.setRoot(load());
     }
 

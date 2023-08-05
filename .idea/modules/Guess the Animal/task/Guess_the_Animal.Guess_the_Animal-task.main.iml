@@ -6,9 +6,11 @@
     <content url="file://$MODULE_DIR$/../../../../Guess the Animal/task/src">
       <sourceFolder url="file://$MODULE_DIR$/../../../../Guess the Animal/task/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../../../Guess the Animal/task/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../../Guess the Animal/task/src/generated" isTestSource="false" generated="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.projectlombok:lombok:1.18.28" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.11.2" level="project" />

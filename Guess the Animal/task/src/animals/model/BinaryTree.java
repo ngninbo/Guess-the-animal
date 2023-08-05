@@ -1,6 +1,6 @@
 package animals.model;
 
-import animals.domain.Direction;
+import animals.domain.NodePath;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,15 +16,13 @@ public class BinaryTree {
         root = addRecursive(root, value);
     }
 
-    public void addAnimal(Node node, final String statement, final String animal, Direction direction) {
-        final Node newAnimal = new Node(animal);
+    public void addChild(Node node, String value, Node child, NodePath nodePath) {
         final Node oldAnimal = new Node(node.getValue());
 
-        boolean isRight = Direction.RIGHT.equals(direction);
+        node.setValue(value);
 
-        node.setValue(statement);
-        node.setRight(isRight ? newAnimal : oldAnimal);
-        node.setLeft(isRight ? oldAnimal : newAnimal);
+        node.setRight(nodePath.isRightPath() ? child : oldAnimal);
+        node.setLeft(nodePath.isRightPath() ? oldAnimal : child);
     }
 
     private Node addRecursive(Node current, String value) {
