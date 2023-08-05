@@ -2110,6 +2110,9 @@ files:
         RIGHT
     }
   learner_created: true
+- name: src/animals/domain/NodeType.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/11084#comment
 status: Solved
 feedback:
