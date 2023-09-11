@@ -25,10 +25,10 @@ public enum MenuItem {
 
     public static MenuItem from(int index) {
 
-        int length = getLength();
+        int length = getLength() - 2;
 
         if (index < 0 || index > length) {
-            System.out.println(MessageRessource.getInstance().format("guess.game.session.menu.item.error", length - 2));
+            System.out.println(MessageRessource.getInstance().format("guess.game.session.menu.item.error", length));
             return MenuItem.UNKNOWN;
         } else if (index == 0) {
             return MenuItem.EXIT;

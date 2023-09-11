@@ -6,19 +6,17 @@ import animals.utils.GuessInput;
 
 import java.util.Stack;
 
-public class SearchCommand implements Command {
-
-    private final NodeService nodeService;
+public class SearchCommand extends Command {
 
     public SearchCommand(NodeService nodeService) {
-        this.nodeService = nodeService;
+        super(nodeService);
     }
 
     @Override
-    public boolean execute() {
+    public GuessState execute() {
         String animal = GuessInput.requestInput(format("guess.game.session.animal.prompt"));
         printFact(ArticleFactory.addUndefinedArticle(animal));
-        return true;
+        return state;
     }
 
     private void printFact(String animal) {

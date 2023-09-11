@@ -8,18 +8,17 @@ import animals.core.Game;
 import animals.service.NodeService;
 import animals.utils.GuessInput;
 
-public class PlayCommand implements Game {
+public class PlayCommand extends Command implements Game {
 
-    private final NodeService nodeService;
     private final GuessGameValidator validator = GuessGameValidator.getInstance();
     private Node current;
 
     public PlayCommand(NodeService nodeService) {
-        this.nodeService = nodeService;
+        super(nodeService);
     }
 
     @Override
-    public boolean execute() {
+    public GuessState execute() {
 
         do {
             guess();
@@ -27,7 +26,7 @@ public class PlayCommand implements Game {
 
         System.out.println(new RandomItem<>(format("guess.game.session.thanks").split("\f")).next());
 
-        return true;
+        return state;
     }
 
     @Override

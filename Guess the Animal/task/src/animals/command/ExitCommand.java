@@ -3,22 +3,22 @@ package animals.command;
 import animals.domain.RandomItem;
 import animals.service.NodeService;
 
-public class ExitCommand implements Command {
-
-    private final NodeService nodeService;
+public class ExitCommand extends Command {
 
     public ExitCommand(NodeService nodeService) {
-        this.nodeService = nodeService;
+        super(nodeService);
     }
 
     @Override
-    public boolean execute() {
+    public GuessState execute() {
 
         save();
 
         sayGoodbye();
 
-        return false;
+        state = GuessState.TERMINATE;
+
+        return state;
     }
 
     public void save() {

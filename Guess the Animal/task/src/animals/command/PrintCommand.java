@@ -5,18 +5,16 @@ import animals.factories.QuestionFactory;
 import animals.model.Node;
 import animals.service.NodeService;
 
-public class PrintCommand implements Command {
-
-    private final NodeService nodeService;
+public class PrintCommand extends Command {
 
     public PrintCommand(NodeService nodeService) {
-        this.nodeService = nodeService;
+        super(nodeService);
     }
 
     @Override
-    public boolean execute() {
+    public GuessState execute() {
         print(nodeService.getRoot());
-        return true;
+        return state;
     }
 
     private void print(Node root) {

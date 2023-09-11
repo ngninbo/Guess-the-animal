@@ -5,16 +5,14 @@ import animals.factories.ArticleFactory;
 import animals.service.NodeService;
 import animals.utils.GuessInput;
 
-public class DeleteCommand implements Command {
-
-    private final NodeService nodeService;
+public class DeleteCommand extends Command {
 
     public DeleteCommand(NodeService nodeService) {
-        this.nodeService = nodeService;
+        super(nodeService);
     }
 
     @Override
-    public boolean execute() {
+    public GuessState execute() {
 
         String animal = getAnimal();
 
@@ -26,7 +24,7 @@ public class DeleteCommand implements Command {
             System.out.println(format("guess.game.session.tree.delete.fail", ArticleFactory.removeAll(animal)));
         }
 
-        return true;
+        return state;
     }
 
     private String getAnimal() {

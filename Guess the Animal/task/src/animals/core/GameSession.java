@@ -1,6 +1,7 @@
 package animals.core;
 
 import animals.command.Command;
+import animals.command.GuessState;
 import animals.domain.MenuItem;
 import animals.factories.ArticleFactory;
 import animals.factories.CommandFactory;
@@ -62,6 +63,7 @@ public class GameSession extends GuessingGame {
     protected boolean execute(MenuItem menuItem) {
         return Optional.ofNullable(new CommandFactory(nodeService).from(menuItem))
                 .map(Command::execute)
+                .map(GuessState.CONTINUE::equals)
                 .orElse(true);
     }
 }

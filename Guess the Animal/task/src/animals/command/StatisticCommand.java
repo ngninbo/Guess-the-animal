@@ -3,18 +3,16 @@ package animals.command;
 import animals.model.TreeStats;
 import animals.service.NodeService;
 
-public class StatisticCommand implements Command {
-
-    private final NodeService nodeService;
+public class StatisticCommand extends Command {
 
     public StatisticCommand(NodeService nodeService) {
-        this.nodeService = nodeService;
+        super(nodeService);
     }
 
     @Override
-    public boolean execute() {
+    public GuessState execute() {
         printStatistics(nodeService.statistics());
-        return true;
+        return state;
     }
 
     private void printStatistics(TreeStats stats) {

@@ -2,19 +2,17 @@ package animals.command;
 
 import animals.service.NodeService;
 
-public class ListCommand implements Command {
-
-    private final NodeService nodeService;
+public class ListCommand extends Command {
 
     public ListCommand(NodeService nodeService) {
-        this.nodeService = nodeService;
+        super(nodeService);
     }
 
     @Override
-    public boolean execute() {
+    public GuessState execute() {
         System.out.print(format("guess.game.session.menu.list.result"));
         nodeService.findAllAnimals()
                 .forEach(value -> System.out.print(format("guess.game.session.tree.search.printf", value)));
-        return true;
+        return state;
     }
 }

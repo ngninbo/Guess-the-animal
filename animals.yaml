@@ -3,9 +3,17 @@ value: "It is a mammal"
 left:
   value: "It is leaving in water."
   left:
-    value: "a shark"
+    value: "It has four legs"
+    left:
+      value: "a shark"
+    right:
+      value: "a fox"
   right:
-    value: "a fish"
+    value: "It is a sneak"
+    left:
+      value: "a fish"
+    right:
+      value: "a anaconda"
 right:
   value: "It is leaving in the forest"
   left:
